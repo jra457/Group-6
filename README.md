@@ -1,4 +1,8 @@
-# Group-6
+# Group Name: Group-6
 
-# Fellow proctologists building an ecommerce site to expand our proctology practice
-![image](https://user-images.githubusercontent.com/111715907/214458597-d5e554f4-f2b7-46cf-b8bc-99447d170037.png)
+| Members  | Net ID | Email |
+| ------------- | ------------- |
+| Jacob Adams  | jra457 | jra457@msstate.edu |
+| Jonas Cooper  | jac1583| jac1583@msstate.edu |
+| Brandon Ladner | bj1298 | bjl298@msstate.edu |
+| Stephen Proctor | swp116 | swp116@msstate.edu |
