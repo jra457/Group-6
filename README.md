@@ -1,4 +1,5 @@
-## Group Name: Group-6
+# Group Name: Group-6
+## Project Name: { placeHolder }
 
 | Members         | Net ID  | Email               |
 | --------------- | ------- | ------------------- |
