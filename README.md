@@ -1,5 +1,4 @@
-# Group Name: Group-6
-
+## Group Name: Group-6
 
 | Members         | Net ID  | Email               |
 | --------------- | ------- | ------------------- |
