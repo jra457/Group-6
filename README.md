@@ -1,5 +1,5 @@
 # Group Name: Group-6
-## Project Name: { placeHolder }
+## Project Name: Knockoff King
 
 | Members         | Net ID  | Email               |
 | --------------- | ------- | ------------------- |
