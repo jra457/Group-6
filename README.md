@@ -28,7 +28,9 @@ The frontend will be designed with Bootstrap which incorporates HTML, JavaScript
 
 * To create a front and backend for a website that establishes an online marketplace. 
 
-
+## Links:
 [My Awesome Wiki](../../wiki)
+
 [My Awesome Group Meetings](../../wiki/Group-Meetings)
+
 [My Awesome User Stories](../../wiki/User-Stories)
