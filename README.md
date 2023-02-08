@@ -26,4 +26,4 @@ The frontend will be designed with Bootstrap which incorporates HTML, JavaScript
 
 ## Objective
 
-* To sell merchandise in an online format. 
+* To create a front and backend for a website that establishes an online marketplace. 
