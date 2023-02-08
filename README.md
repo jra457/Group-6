@@ -30,3 +30,5 @@ The frontend will be designed with Bootstrap which incorporates HTML, JavaScript
 
 
 [My Awesome Wiki](../../wiki)
+[My Awesome Group Meetings](../../wiki/Group-Meetings)
+[My Awesome User Stories](../../wiki/User-Stories)
