@@ -1,7 +1,6 @@
 # Group Name: Group-6
 ## Project Name: Knockoff King
 
-
 | Members         | Net ID  | Email               | Role
 | --------------- | ------- | ------------------- | ------------
 | Jacob Adams     | jra457  | jra457@msstate.edu  | Team Lead
