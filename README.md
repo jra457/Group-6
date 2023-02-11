@@ -1,8 +1,8 @@
 # Group Name: Group-6
 ## Project Name: Knockoff King
 
-| Members         | Net ID  | Email               |
-| --------------- | ------- | ------------------- |
+| Members         | Net ID  | Email               | Role
+| --------------- | ------- | ------------------- | ------------
 | Jacob Adams     | jra457  | jra457@msstate.edu  |
 | Jonas Cooper    | jac1583 | jac1583@msstate.edu | Documentation and Design
 | Brandon Ladner  | bjl298  | bjl298@msstate.edu  |
