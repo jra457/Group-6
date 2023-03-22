@@ -22,13 +22,13 @@ The frontend will be designed with Bootstrap which incorporates HTML, JavaScript
 
 ## Getting Started
 * HTML:
-[class/templates/class](class/templates/class)
+[groupSix/knockoffKing/templates/knockoffKing](groupSix/knockoffKing/templates/knockoffKing)
 * Database management/design:
-[class/models.py](class/models.py)
+[groupSix/knockoffKing/models.py](groupSix/knockoffKing/models.py)
 * Front/Back end communication:
-[class/views.py](class/views.py)
+[groupSix/knockoffKing/views.py](groupSix/knockoffKing/views.py)
 * Link between HTML, manage.py and views.py:
-[class/urls.py](class/urls.py)
+[groupSix/knockoffKing/urls.py](groupSix/knockoffKing/urls.py)
 
 ## Features
 
