@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 import uuid
 from django.utils import timezone
-from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -14,6 +13,44 @@ class User(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return self.id
+# ~~~~~
+
+
+
+# ~~~~~ Product Model ~~~~~
+class Product(models.Model):
+    """Model representing the Product."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    name = models.CharField(max_length=64, default='', help_text='Enter the Product Name.')    
+
+    quantity = models.IntegerField(default=1, help_text='Product Quantity')
+
+    # I can't remember how to call a model that has not be declared yet, pretty sure
+    # you put the name in quotes?
+    seller = models.ForeignKey("Seller", on_delete=models.CASCADE, null=True, help_text='Select the Product.')
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.id
+# ~~~~~
+
+# 
+# Seller and Quantity either need to be declared either in the Inventory or Product class
+# if it's best declared in Product, then we can probably delete the Inventory class
+# it would probably be easier to put it in Product and do a one to many relationship
+# but if we put it into Inventory we could do a many to many relationship which would be
+# more flexible
+#  
+
+# ~~~~~ Inventory Model ~~~~~
+class Inventory(models.Model):
+    """Model representing the Inventory."""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.product.id
 # ~~~~~
 
 
@@ -59,9 +96,10 @@ class OrderDetails(models.Model):
     """Model representing the Order Details."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # productID: int
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
 
-    # productName: string
+    # No idea if this works, I usually call product.name inside of the views.py
+    productName = product.name
 
     # quantity: int
 
@@ -79,7 +117,7 @@ class OrderDetails(models.Model):
 # ~~~~~ Shipping Info Model ~~~~~
 class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     streetNumber = models.IntegerField(max_length=16, default='', help_text='Street Number')
 
@@ -142,7 +180,7 @@ class ShippingInfo(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.user.id
+        return self.customer.user.id
 # ~~~~~
 
 
