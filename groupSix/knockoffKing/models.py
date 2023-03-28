@@ -119,7 +119,7 @@ class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    streetNumber = models.IntegerField(max_length=16, default='', help_text='Street Number')
+    streetNumber = models.IntegerField(default='', help_text='Street Number')
 
     streetName = models.CharField(max_length=64, default='', help_text='Street Name')
 
@@ -172,7 +172,7 @@ class ShippingInfo(models.Model):
     )
     # ~~~~~
 
-    zipCode = models.IntegerField(max_length=5, default='', help_text='Zip Code')
+    zipCode = models.IntegerField(default='', help_text='Zip Code')
 
     # shippingType: string
 
@@ -201,7 +201,7 @@ class Order(models.Model):
     # ~~~~~ Shipping Status
     orderPlaced, packaging     , shipped, = '01', '02', '03'
     inTransit  , outForDelivery, delayed, = '04', '05', '06'
-    delivered,                            = '07'
+    delivered                             = '07'
 
     statusChoices = [
         (orderPlaced, 'Order Placed'), (packaging     , 'Packaging'       ), (shipped, 'Shipped'), 
