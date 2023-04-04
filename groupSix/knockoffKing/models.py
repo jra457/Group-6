@@ -54,7 +54,7 @@ class Product(models.Model):
 
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE, null=True, blank=True, help_text='Select the Product.')
 
-    category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name='products', null=True, blank=True, help_text='Select the product Category.')
+    # category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name='products', null=True, blank=True, help_text='Select the product Category.')
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -96,8 +96,6 @@ class Seller(models.Model):
     """Model representing the Seller."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    products = models.ManyToManyField(Product)
-
     def __str__(self):
         """String for representing the Model object."""
         return self.user.id
@@ -131,7 +129,7 @@ class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    streetNumber = models.CharField(default='', help_text='Street Number')
+    streetNumber = models.CharField(default='', help_text='Street Number', max_length=16)
 
     streetName = models.CharField(max_length=64, default='', help_text='Street Name')
 
@@ -186,7 +184,7 @@ class ShippingInfo(models.Model):
 
     zipCode = models.IntegerField(default='', help_text='Zip Code')
 
-    shippingCost = models.DecimalField(default=1)
+    shippingCost = models.DecimalField(default=1, decimal_places=2, max_digits=10000)
 
     def getAddress(self):
         """String for representing the Model object."""
