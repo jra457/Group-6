@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 import uuid
 from django.utils import timezone
+from decimal import Decimal
+from django.contrib.auth.hashers import make_password, check_password
 
 # Create your models here.
 
@@ -10,7 +12,25 @@ class User(models.Model):
     """Model representing the User."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    def __str__(self):
+    email = models.EmailField(max_length=255, verbose_name='email address', help_text='Enter your Email.', unique=True)
+
+    password = models.CharField(max_length=128)
+
+    firstName = models.CharField(max_length=64, default='', help_text='Enter your Last Name.')
+
+    lastName = models.CharField(max_length=64, default='', help_text='Enter your First Name..')
+
+    joinDate = models.DateTimeField(auto_now_add=True)
+
+    def setPass(self, rawPass):
+        """Sets the Password for the User."""
+        self.password = make_password(rawPass)
+
+    def testPass(self, rawPass):
+        """Checks the User's Password."""
+        return check_password(rawPass, self.password)
+
+    def getUserID(self):
         """String for representing the Model object."""
         return self.id
 # ~~~~~
@@ -22,35 +42,27 @@ class Product(models.Model):
     """Model representing the Product."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    name = models.CharField(max_length=64, default='', help_text='Enter the Product Name.')    
+    name = models.CharField(max_length=64, default='', help_text='Enter the product Name.')
 
-    quantity = models.IntegerField(default=1, help_text='Product Quantity')
+    description = models.TextField(default='', max_length=1000, help_text='Enter the product Description.')
 
-    # I can't remember how to call a model that has not be declared yet, pretty sure
-    # you put the name in quotes?
-    seller = models.ForeignKey("Seller", on_delete=models.CASCADE, null=True, help_text='Select the Product.')
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.0, help_text='Enter product Price')
 
-    def __str__(self):
+    quantity = models.IntegerField(default=1, help_text='Enter product Quantity')
+
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
+
+    seller = models.ForeignKey('Seller', on_delete=models.CASCADE, null=True, blank=True, help_text='Select the Product.')
+
+    category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name='products', null=True, blank=True, help_text='Select the product Category.')
+
+    created = models.DateTimeField(auto_now_add=True)
+
+    updated = models.DateTimeField(auto_now=True)
+
+    def getName(self):
         """String for representing the Model object."""
-        return self.id
-# ~~~~~
-
-# 
-# Seller and Quantity either need to be declared either in the Inventory or Product class
-# if it's best declared in Product, then we can probably delete the Inventory class
-# it would probably be easier to put it in Product and do a one to many relationship
-# but if we put it into Inventory we could do a many to many relationship which would be
-# more flexible
-#  
-
-# ~~~~~ Inventory Model ~~~~~
-class Inventory(models.Model):
-    """Model representing the Inventory."""
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
-
-    def __str__(self):
-        """String for representing the Model object."""
-        return self.product.id
+        return self.name
 # ~~~~~
 
 
@@ -84,6 +96,8 @@ class Seller(models.Model):
     """Model representing the Seller."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
+    products = models.ManyToManyField(Product)
+
     def __str__(self):
         """String for representing the Model object."""
         return self.user.id
@@ -94,22 +108,20 @@ class Seller(models.Model):
 # ~~~~~ Order Details Model ~~~~~
 class OrderDetails(models.Model):
     """Model representing the Order Details."""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
 
-    # No idea if this works, I usually call product.name inside of the views.py
-    productName = product.name
+    quantity = models.IntegerField(default=1)
 
-    # quantity: int
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
-    # unitCost: float
+    subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
-    # subTotal: float
+    def getTotal(self):
+        return self.quantity * self.price
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.id
+        return self.product.name
 # ~~~~~
 
 
@@ -119,7 +131,7 @@ class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    streetNumber = models.IntegerField(default='', help_text='Street Number')
+    streetNumber = models.CharField(default='', help_text='Street Number')
 
     streetName = models.CharField(max_length=64, default='', help_text='Street Name')
 
@@ -167,20 +179,18 @@ class ShippingInfo(models.Model):
     state = models.CharField(
         max_length=2,
         choices=stateChoices,
-        default=Alabama,
+        default='AL',
         help_text="State",
     )
     # ~~~~~
 
     zipCode = models.IntegerField(default='', help_text='Zip Code')
 
-    # shippingType: string
+    shippingCost = models.DecimalField(default=1)
 
-    # shippingCost: float
-
-    def __str__(self):
+    def getAddress(self):
         """String for representing the Model object."""
-        return self.customer.user.id
+        return f"{self.streetNumber} {self.streetName}, {self.city}, {self.state}"
 # ~~~~~
 
 
@@ -190,11 +200,9 @@ class Order(models.Model):
     """Model representing the Order."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    # dateCreated: date
+    dateCreated = models.DateTimeField(auto_now_add=True)
 
-    # dateShipped: date
-
-    # custerName: string
+    dateShipped = models.DateField(null=True, blank=True)
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the Customer.')
 
@@ -222,7 +230,7 @@ class Order(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.id
+        return self.id  
 # ~~~~~
 
 
@@ -234,13 +242,27 @@ class ShoppingCart(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    # productID: int
-
-    # quantity: int
-
-    # dateAdded: date
-
+    items = models.ManyToManyField(Product, through='CartItem')
+    
     def __str__(self):
         """String for representing the Model object."""
-        return self.id
+        return str(self.id)
+# ~~~~~
+    
+
+
+# ~~~~~ Cart Item Model ~~~~~
+class CartItem(models.Model):
+    """Model representing a specific Item in a Shopping Cart."""
+    shoppingCart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE)
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    quantity = models.PositiveIntegerField(default=1)
+    
+    dateAdded = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.quantity}x {self.product} in {self.shoppingCart}'
 # ~~~~~
