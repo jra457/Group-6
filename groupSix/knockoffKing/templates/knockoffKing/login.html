@@ -1,17 +1,45 @@
 {% extends 'knockoffKing/index.html' %}
 
 {% block content %}
+
+  <!-- Login Page (Start) -->
+
+  <!-- Login Page Title -->
   <h2>Login</h2>
+  <!-- Login Page Title -->
+
+  <!-- Login Page ~ Form ~ (Start) -->
   <form method="post">
+
     {% csrf_token %}
+
+    <!-- (Input) Username Start -->
     <div>
       <label for="id_username">Username:</label>
       <input type="text" name="username" id="id_username">
     </div>
+    <!-- (Input) Username End -->
+
+
+    
+    <!-- (Input) Password Start -->
     <div>
       <label for="id_password">Password:</label>
       <input type="password" name="password" id="id_password">
     </div>
+    <!-- (Input) Password End -->
+
+
+
+    <!-- (Button) Submit -->
     <button type="submit">Login</button>
+    <!-- (Button) Submit -->
+
+
+
   </form>
+  <!-- Login Page ~ Form ~ (End) -->
+
+  <!-- Login Page (End) -->
+
 {% endblock %}
