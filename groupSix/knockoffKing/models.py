@@ -5,7 +5,7 @@ from django.utils import timezone
 from decimal import Decimal
 from django.contrib.auth.hashers import make_password, check_password
 
-# Create your models here.
+# Create your models here. acca cock and ball torture!!!!
 
 # ~~~~~ User Model ~~~~~
 class User(models.Model):
