@@ -117,14 +117,14 @@ def register_view(request):
         try:
             # Check username with existing users in database
             User.objects.get(username = request.POST['username'])
-
+            print("username:", User.objects.get(username = request.POST['username']))
             # Error if username is already taken
-            return render (request, 'accounts/signup.html', {'error':'Username is already taken!'})
+            return render (request, 'knockoffKing/register.html', {'error':'Username is already taken!'})
         
         except User.DoesNotExist:
             # Create user if username does not exist
             user = User.objects.create_user(request.POST['username'],password=request.POST['password1'])
-
+            print("user:", user)
             # Login user with new credentials 
             login(request, user)
 
