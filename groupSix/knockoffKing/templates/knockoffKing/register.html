@@ -1,0 +1,69 @@
+{% extends 'knockoffKing/index.html' %}
+
+{% block content %}
+
+<!-- Register Page Start -->
+
+<div class="container px-1 py-3" id="sellerContainer">
+
+    <!-- Title -->
+    <h2 class="pb-2 border-bottom" style="color:#999999">Register</h2>
+    <!-- Title -->
+    
+
+    <!-- Register Page ~ Form ~ (Start) -->
+    <form class="row g-3 needs-validation" novalidate>
+        
+        <!-- (Input) First Name -->
+        <div class="col-md-4 position-relative">
+            <label for="username" class="form-label">First name</label>
+            <input type="text" class="form-control" id="validationTooltip01" required>
+            <div class="valid-tooltip">
+                Looks good!
+            </div>
+        </div>
+        <!-- (Input) First Name -->
+
+
+
+        <!-- (Input) Last Name -->
+        <div class="col-md-4 position-relative">
+            <label for="validationTooltip02" class="form-label">Last name</label>
+            <input type="text" class="form-control" id="validationTooltip02" required>
+            <div class="valid-tooltip">
+                Looks good!
+            </div>
+        </div>
+        <!-- (Input) Last Name -->
+
+
+
+        <!-- (Input) Email -->
+        <div class="col-md-4 position-relative">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-control" required>
+            <div class="valid-tooltip">
+                Looks good!
+            </div>
+        </div>
+        <!-- (Input) Email -->
+
+
+
+        <!-- (Button) Submit -->
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit">Register</button>
+        </div>
+        <!-- (Button) Submit -->
+
+    </form>
+    <!-- Register Page ~ Form ~ (End) -->
+
+</div>
+
+<!-- Register Page End -->
+
+{% endblock %}
+
+
+
