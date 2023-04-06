@@ -4,42 +4,53 @@
 
   <!-- Login Page (Start) -->
 
+<div class="container px-1 py-3" id="sellerContainer">
+
   <!-- Login Page Title -->
-  <h2>Login</h2>
+  <h2 class="pb-2 border-bottom" style="color:#999999">Login</h2>
   <!-- Login Page Title -->
 
   <!-- Login Page ~ Form ~ (Start) -->
-  <form method="post">
+  <form class="row g-3 needs-validation" novalidate method="post" action="/login/">
 
     {% csrf_token %}
 
-    <!-- (Input) Username Start -->
-    <div>
-      <label for="id_username">Username:</label>
-      <input type="text" name="username" id="id_username">
+    <!-- (Input) Email -->
+    <div class="col-md-4 position-relative">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+      <div class="valid-tooltip">
+          Looks good!
+      </div>
     </div>
-    <!-- (Input) Username End -->
-
+    <!-- (Input) Email -->
 
     
-    <!-- (Input) Password Start -->
-    <div>
-      <label for="id_password">Password:</label>
-      <input type="password" name="password" id="id_password">
+    
+    <!-- (Input) Password -->
+    <div class="col-md-4 position-relative">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+      <div class="valid-tooltip">
+          Looks good!
+      </div>
     </div>
-    <!-- (Input) Password End -->
+    <!-- (Input) Password -->
 
 
 
     <!-- (Button) Submit -->
-    <button type="submit">Login</button>
+    <div class="col-12">
+      <button class="btn btn-primary" type="submit">Login</button>
+    </div>
     <!-- (Button) Submit -->
-
-
 
   </form>
   <!-- Login Page ~ Form ~ (End) -->
 
+</div>
+
   <!-- Login Page (End) -->
 
 {% endblock %}
+
