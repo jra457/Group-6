@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from .models import UserModel
 
 
 
@@ -73,12 +76,12 @@ def login_view(request):
     # Check for [HTTP] POST method
     if request.method == 'POST':
 
-        # Fetch username & password
-        username = request.POST.get('username')
+        # Fetch email & password
+        email = request.POST.get('email')
         password = request.POST.get('password')
 
         # Check username & password with database
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=email, password=password)
 
         if user is not None:
             # Redirect to home if username && password is valid
@@ -111,28 +114,35 @@ def logout_view(request):
 
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
 def register_view(request):
-    # Check for [HTTP] POST method
+    print("TEST1")
     if request.method == 'POST':
-
-        try:
-            # Check username with existing users in database
-            User.objects.get(username = request.POST['username'])
-
-            # Error if username is already taken
-            return render (request, 'accounts/signup.html', {'error':'Username is already taken!'})
+        # Get the form data
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        print("TEST2")
         
-        except User.DoesNotExist:
-            # Create user if username does not exist
-            user = User.objects.create_user(request.POST['username'],password=request.POST['password1'])
+        # Check if email already exists in database
+        if User.objects.filter(email=email).exists():
+            print("TEST3")
+            return render(request, 'knockoffKing/register.html', {'error': 'Email already in use'})
+            
+        # Create the user object but do not save it yet
+        user = User(first_name=first_name, last_name=last_name, email=email, username=email)
+        user.set_password(password)
+        print("TEST4")
+        # Save the user object to the database
+        user.save()
 
-            # Login user with new credentials 
-            login(request, user)
-
-            # Redirect to home
-            return redirect('home')
+        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
+        usermodel.setPass(password)
+        usermodel.save()
         
-    # If not [HTTP] POST, render register page
-    return render(request,'knockoffKing/register.html')
+        # Redirect to success page
+        return render(request, 'knockoffKing/home.html', {'user': user})
+    print("TEST5")
+    return render(request, 'knockoffKing/register.html')
 # ~~~~~~~~~~~~~~~~~~~~
 
 
