@@ -3,14 +3,17 @@ from django.urls import reverse
 import uuid
 from django.utils import timezone
 from decimal import Decimal
+from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your models here. acca cock and ball torture!!!!
 
 # ~~~~~ User Model ~~~~~
-class User(models.Model):
+class UserModel(models.Model):
     """Model representing the User."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     email = models.EmailField(max_length=255, verbose_name='email address', help_text='Enter your Email.', unique=True)
 
@@ -33,6 +36,13 @@ class User(models.Model):
     def getUserID(self):
         """String for representing the Model object."""
         return self.id
+    
+    def __str__(self):
+        return f'{self.lastName}, {self.firstName}, {self.email}'
+    
+    class Meta:
+        ordering = ['lastName', 'firstName']
+
 # ~~~~~
 
 
@@ -70,7 +80,7 @@ class Product(models.Model):
 # ~~~~~ Admin Model ~~~~~
 class Admin(models.Model):
     """Model representing the Admin."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     def __str__(self):
         """String for representing the Model object."""
@@ -82,7 +92,7 @@ class Admin(models.Model):
 # ~~~~~ Customer Model ~~~~~
 class Customer(models.Model):
     """Model representing the Customer."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     def __str__(self):
         """String for representing the Model object."""
@@ -94,11 +104,16 @@ class Customer(models.Model):
 # ~~~~~ Seller Model ~~~~~
 class Seller(models.Model):
     """Model representing the Seller."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+
+    name = models.CharField(max_length=64, default='', help_text='Enter the store Name.')
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.user.id
+        return f'{self.name}, {self.user.email}'
+    
+    class Meta:
+        ordering = ['name', 'user__email']
 # ~~~~~
 
 
@@ -238,7 +253,7 @@ class ShoppingCart(models.Model):
     """Model representing the Shopping Cart."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     items = models.ManyToManyField(Product, through='CartItem')
     

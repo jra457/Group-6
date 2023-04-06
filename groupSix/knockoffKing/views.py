@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from .models import UserModel
 
 
 
@@ -113,28 +114,34 @@ def logout_view(request):
 
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
 def register_view(request):
+    print("TEST1")
     if request.method == 'POST':
         # Get the form data
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        print("first_name:", first_name)
+        print("TEST2")
         
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
+            print("TEST3")
             return render(request, 'knockoffKing/register.html', {'error': 'Email already in use'})
-        
+            
         # Create the user object but do not save it yet
         user = User(first_name=first_name, last_name=last_name, email=email, username=email)
         user.set_password(password)
-        
+        print("TEST4")
         # Save the user object to the database
         user.save()
+
+        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
+        usermodel.setPass(password)
+        usermodel.save()
         
         # Redirect to success page
         return render(request, 'knockoffKing/home.html', {'user': user})
-        
+    print("TEST5")
     return render(request, 'knockoffKing/register.html')
 # ~~~~~~~~~~~~~~~~~~~~
 
