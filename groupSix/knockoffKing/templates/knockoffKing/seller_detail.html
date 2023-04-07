@@ -24,7 +24,7 @@
                     <div class="text-center">
                         <button class="btn btn-primary" type="submit">Add to Cart</button>
                         <a class="btn btn-secondary" href="#" role="button">Update</a>
-                        <button class="btn btn-danger" type="submit">Delete</button>
+                        <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
                     </div>
 
                 </div>

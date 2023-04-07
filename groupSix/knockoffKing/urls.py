@@ -26,6 +26,8 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
+    path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
+    
 
     # Generic Views
     path('seller/<slug:nameSlug>', views.SellerDetailView.as_view(), name='seller-detail'),

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views import generic
 from .models import *
+from django.http import HttpResponseRedirect
 
 
 
@@ -182,4 +183,14 @@ def dashboard_view(request):
     }
     return render(request, 'knockoffKing/dashboard.html', context=context)
     # ~~~~~
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Delete Product ~~~~~~~~~~
+def delete_product_view(request, product_id):
+    product = Product.objects.get(pk=product_id)
+    product.delete()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~
