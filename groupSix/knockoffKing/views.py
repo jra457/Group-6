@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
-from .models import UserModel
+from django.views import generic
+from .models import *
 
 
 
@@ -26,8 +26,15 @@ def Home(request):
             # Redirect user to home
             return redirect('home')
 
+    sellerList = Seller.objects.all()
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'sellerList': sellerList,
+    }
     # If not [HTTP] POST, render home
-    return render(request, 'knockoffKing/home.html')
+    return render(request, 'knockoffKing/home.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~
 
 
@@ -68,6 +75,25 @@ def seller_view(request):
     # ~~~~~
 # ~~~~~
 
+
+
+# ~~~~~ Seller Detail View ~~~~~
+class SellerDetailView(generic.DetailView):
+    model = Seller
+
+    slug_field = 'nameSlug'
+    slug_url_kwarg = 'nameSlug'
+
+    def seller_detail_view(request, slug):
+        seller = get_object_or_404(Seller, nameSlug=slug)
+
+        # ~~~~~ Return Generated Values ~~~~~
+        context = {
+            'seller': seller,
+        }
+        return render(request, 'knockoffKing/seller_detail.html', context=context)
+        # ~~~~~
+# ~~~~~
 
 
 

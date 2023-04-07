@@ -1,9 +1,10 @@
+import uuid
 from django.db import models
 from django.urls import reverse
-import uuid
 from django.utils import timezone
 from decimal import Decimal
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your models here. acca cock and ball torture!!!!
@@ -73,6 +74,9 @@ class Product(models.Model):
     def getName(self):
         """String for representing the Model object."""
         return self.name
+    
+    def __str__(self):
+        return f'{self.seller.name}, {self.name}, ${self.price} ({self.quantity})'
 # ~~~~~
 
 
@@ -107,6 +111,19 @@ class Seller(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     name = models.CharField(max_length=64, default='', help_text='Enter the store Name.')
+
+    nameSlug = models.SlugField(unique=True, null=True, blank=True)
+
+    def get_absolute_url(self):
+        nameSlug = slugify(self.name)
+
+        """Returns the url to access a particular location instance."""
+        return reverse('seller-detail', args=[nameSlug])
+    
+    def save(self, *args, **kwargs):
+        """Override the save method to set the slug_name field."""
+        self.nameSlug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         """String for representing the Model object."""

@@ -6,12 +6,23 @@
 
   <div class="jumbotron">
 
-    <!-- Home Page Title -->
-    <h1>Welcome to Knockoff King</h1>
-    <!-- Home Page Title -->
+  <!-- Home Page Title -->
+  <h1>Welcome to Knockoff King</h1>
+  <!-- Home Page Title -->
 
-    <p>Shop for the latest products</p>
-    <p><a class="btn btn-primary btn-lg" href="#" role="button">Shop now</a></p>
+  <p>Shop for the latest products</p>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Shop now</a></p>
+
+  <ul class="list-group">
+    {% for seller in sellerList %}
+      <li class="list-group-item">
+        <a href="{{ seller.get_absolute_url }}">
+          <i class="fas fa-circle me-2"></i>{{ seller.name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
 
   </div>
 
