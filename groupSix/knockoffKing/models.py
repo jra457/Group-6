@@ -1,9 +1,10 @@
+import uuid
 from django.db import models
 from django.urls import reverse
-import uuid
 from django.utils import timezone
 from decimal import Decimal
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password, check_password
 
 # Create your models here. acca cock and ball torture!!!!
@@ -66,13 +67,28 @@ class Product(models.Model):
 
     # category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name='products', null=True, blank=True, help_text='Select the product Category.')
 
+    # review = models.IntegerField(default=0)
+
+    # numReviews = models.IntegerField(default=0)
+
     created = models.DateTimeField(auto_now_add=True)
 
     updated = models.DateTimeField(auto_now=True)
 
+    # def getReviewVal(self):
+    #     return self.review
+
+    # def updateReview(self, reviewIn):
+    #     self.numReviews = self.numReviews + 1
+    #     self.review = (self.review + reviewIn) / self.numReviews
+    #     return
+
     def getName(self):
         """String for representing the Model object."""
         return self.name
+    
+    def __str__(self):
+        return f'{self.seller.name}, {self.name}, ${self.price} ({self.quantity})'
 # ~~~~~
 
 
@@ -84,7 +100,7 @@ class Admin(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.user.id
+        return self.user.email
 # ~~~~~
 
 
@@ -96,7 +112,7 @@ class Customer(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.user.id
+        return self.user.email
 # ~~~~~
 
 
@@ -107,6 +123,19 @@ class Seller(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     name = models.CharField(max_length=64, default='', help_text='Enter the store Name.')
+
+    nameSlug = models.SlugField(unique=True, null=True, blank=True)
+
+    def get_absolute_url(self):
+        nameSlug = slugify(self.name)
+
+        """Returns the url to access a particular location instance."""
+        return reverse('seller-detail', args=[nameSlug])
+    
+    def save(self, *args, **kwargs):
+        """Override the save method to set the slug_name field."""
+        self.nameSlug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         """String for representing the Model object."""

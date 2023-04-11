@@ -1,0 +1,41 @@
+{% extends 'knockoffKing/index.html' %}
+
+{% block content %}
+
+<!-- Seller Detail Page Start -->
+
+<div class="container px-1 py-3" id="sellerDetailContainer">
+
+    <!-- Seller Detail Page Title -->
+    <h2 class="pb-2 border-bottom" style="color:#999999">{{ seller.name }}</h2>
+    <!-- Seller Detail Page Title -->
+
+    <!-- Seller Product Grid -->
+    <div class="row row-cols-4 g-4">
+        {% for product in seller.product_set.all %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.description }}</p>
+                    </div>
+
+                    <div class="text-center">
+                        <button class="btn btn-primary" type="submit">Add to Cart</button>
+                        <a class="btn btn-secondary" href="#" role="button">Update</a>
+                        <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Seller Product Grid -->
+
+
+</div>
+
+<!-- Seller Detail Page End -->
+
+{% endblock %}
