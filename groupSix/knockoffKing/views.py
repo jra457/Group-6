@@ -9,7 +9,6 @@ from django.contrib.auth.models import Group
 
 
 
-# ~~~~~~~~~~ Home View ~~~~~~~~~~
 def Home(request):
     # Check for [HTTP] POST method
     if request.method == 'POST':
@@ -31,51 +30,64 @@ def Home(request):
     sellerList = Seller.objects.all()
 
     seller_name = None
-    if request.user.is_authenticated:
-        try:
-            user_instance = request.user
-            print("user_instance:", user_instance)
+    customer = None
+    seller = None
+    user_test = None
+    group_name = None
 
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            print("user_model_instance:", user_model_instance)
-            print("USER EXISTS")
+            user_test = user_model_instance.user
+            group = user_test.groups.first()
+            if group:
+                group_name = group.name
+            else:
+                group_name = None
+
             # Check if the user is a Seller
             try:
                 seller = Seller.objects.get(user=user_model_instance)
-                print("seller:", seller)
-
                 seller_name = seller.name
-                print("seller_name:", seller_name)
-                print("USER IS SELLER")
 
             # If the user is not a Seller, try to find a Customer instance
             except Seller.DoesNotExist:
                 try:
                     customer = Customer.objects.get(user=user_model_instance)
-                    print("customer:", customer)
-
                     customer_name = customer.user.firstName
-                    print("customer_name:", customer_name)
-                    print("USER IS CUSTOMER")
 
                 except Customer.DoesNotExist:
-                    print("USER IS NOT CUSTOMER")
                     pass
 
         except UserModel.DoesNotExist:
             print("USER DOES NOT EXIST")
             pass
 
+    book_nook = Seller.objects.get(name='Book Nook')
+    # books = Product.objects.filter(seller=book_nook)
+    book_list = Product.objects.filter(seller=book_nook)[:4]
 
-    # ~~~~~ Return Generated Values ~~~~~
+    sports_world = Seller.objects.get(name='Sports World')
+    equipment_list = Product.objects.filter(seller=sports_world)[:4]
+    
+
     context = {
         'sellerList': sellerList,
-        # 'user': user,
+        'customer': customer,
+        'seller': seller,
+        'user_test': user_test,
+        'groupName': group_name,
+
+        'book_nook': book_nook,
+        'book_list': book_list,
+
+        'sports_world': sports_world,
+        'equipment_list': equipment_list,
     }
-    # If not [HTTP] POST, render home
+
     return render(request, 'knockoffKing/home.html', context=context)
-    # ~~~~~
-# ~~~~~~~~~~~~~~~~~~~~
+
 
 
 
@@ -128,7 +140,7 @@ class SellerDetailView(generic.DetailView):
     def seller_detail_view(request, slug):
         # Get Seller instance from Seller (slug) name
         seller = get_object_or_404(Seller, nameSlug=slug)
-
+        
         # ~~~~~ Return Generated Values ~~~~~
         context = {
             'seller': seller,

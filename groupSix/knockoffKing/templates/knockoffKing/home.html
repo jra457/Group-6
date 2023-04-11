@@ -1,28 +1,98 @@
 {% extends 'knockoffKing/index.html' %}
 
+{% load group_tags %} {# Load the custom filter #}
+
 {% block content %}
 
   <!-- Home Page Start -->
 
+  <div class="container px-1 py-3" id="homeContainer">
+
   <div class="jumbotron">
 
-  <!-- Home Page Title -->
-  <h1>Welcome to Knockoff King {{ user.name }}</h1>
-  <!-- Home Page Title -->
+    <!-- Home Page Title -->
+    {% if user.is_authenticated %}
 
-  <p>Shop for the latest products</p>
-  <p><a class="btn btn-primary btn-lg" href="#" role="button">Shop now</a></p>
+      <h1>Welcome to Knockoff King {{ user.first_name }} {{ user.last_name }}</h1>
 
-  <ul class="list-group">
-    {% for seller in sellerList %}
-      <li class="list-group-item">
-        <a href="{{ seller.get_absolute_url }}">
-          <i class="fas fa-circle me-2"></i>{{ seller.name }}
-        </a>
-      </li>
+      Email: {{ user.email }}
+
+    {% else %}
+
+      <h1>Welcome to Knockoff King</h1>
+
+    {% endif %}
+    <!-- Home Page Title -->
+
+    {% if user|has_group:"Customer" %}
+      <!-- User is a customer -->
+      <div>
+        <p>Group: Customer</p>
+        <!-- Add content specific to customers here -->
+      </div>
+    {% elif user|has_group:"Seller" %}
+      <!-- User is a seller -->
+      <div>
+        <p>Group: Seller</p>
+        <!-- Add content specific to sellers here -->
+      </div>
+    {% else %}
+      <!-- User is not in Customer or Seller groups -->
+      <div>
+        <p>Welcome, User!</p>
+        <!-- Add content for users who are not customers or sellers here -->
+      </div>
+    {% endif %}
+
+
+    <h3>Shop for the latest products</h3>
+
+  </div>
+
+  <br>
+  <h5><a href="{{ book_nook.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ book_nook.name }}</a></h5>
+  <!-- Seller Product Grid -->
+  <div class="row row-cols-4 g-4">
+    {% for product in book_list %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+          </div>
+
+          <div class="text-center">
+            <button class="btn btn-primary" type="submit">Add to Cart</button>
+          </div>
+
+        </div>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
+  <!-- Seller Product Grid -->
+  <br>
+  <h5><a href="{{ sports_world.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ sports_world.name }}</a></h5>
+  <!-- Seller Product Grid -->
+  <div class="row row-cols-4 g-4">
+    {% for product in equipment_list %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+          </div>
 
+          <div class="text-center">
+            <button class="btn btn-primary" type="submit">Add to Cart</button>
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <!-- Seller Product Grid -->
 
   </div>
 
