@@ -61,7 +61,7 @@
         </div>
         <!-- (Input) Password -->
 
-
+        
 
         <!-- (Input) User Type Hidden Field -->
         <input type="hidden" name="usrTypeIn" id="usrTypeIn">
@@ -71,16 +71,12 @@
 
         <!-- (Input) User Type -->
         <div class="col-md-4 position-relative">
-            <label for="userTypebtn" class="form-label">User Type</label>
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="usrTypeBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                  Select User Type
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="usrTypeBtn">
-                  <li><a class="dropdown-item" href="#" onclick="setUserType('Customer')">Customer</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="setUserType('Seller')">Seller</a></li>
-                </ul>
-              </div>
+            <label for="usrTypeSelect" class="form-label">Select User Type</label>
+            <select class="form-select" id="usrTypeSelect" name="usrTypeSelect" required aria-describedby="validationMessage" required>
+                <option value="Customer">Customer</option>
+                <option value="Seller">Seller</option>
+            </select>
+            <div class="invalid-feedback" id="validationMessage">Please select a user type</div>
         </div>
         <!-- (Input) User Type -->
 
@@ -88,7 +84,7 @@
 
         <!-- (Button) Submit -->
         <div class="col-12">
-            <button class="btn btn-primary" type="submit">Register</button>
+            <button class="btn btn-primary" type="submit" aria-describedby="validationMessage">Register</button>
         </div>
         <!-- (Button) Submit -->
 
@@ -98,13 +94,6 @@
 </div>
 
 <!-- Register Page End -->
-
-<script>
-    function setUserType(userType) {
-      document.getElementById("usrTypeBtn").innerText = userType;
-      document.getElementById("usrTypeIn").value = userType;
-    }
-  </script>
 
 {% endblock %}
 
