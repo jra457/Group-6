@@ -30,9 +30,47 @@ def Home(request):
 
     sellerList = Seller.objects.all()
 
+    seller_name = None
+    if request.user.is_authenticated:
+        try:
+            user_instance = request.user
+            print("user_instance:", user_instance)
+
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            print("user_model_instance:", user_model_instance)
+            print("USER EXISTS")
+            # Check if the user is a Seller
+            try:
+                seller = Seller.objects.get(user=user_model_instance)
+                print("seller:", seller)
+
+                seller_name = seller.name
+                print("seller_name:", seller_name)
+                print("USER IS SELLER")
+
+            # If the user is not a Seller, try to find a Customer instance
+            except Seller.DoesNotExist:
+                try:
+                    customer = Customer.objects.get(user=user_model_instance)
+                    print("customer:", customer)
+
+                    customer_name = customer.user.firstName
+                    print("customer_name:", customer_name)
+                    print("USER IS CUSTOMER")
+
+                except Customer.DoesNotExist:
+                    print("USER IS NOT CUSTOMER")
+                    pass
+
+        except UserModel.DoesNotExist:
+            print("USER DOES NOT EXIST")
+            pass
+
+
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'sellerList': sellerList,
+        # 'user': user,
     }
     # If not [HTTP] POST, render home
     return render(request, 'knockoffKing/home.html', context=context)
@@ -83,16 +121,19 @@ def seller_view(request):
 class SellerDetailView(generic.DetailView):
     model = Seller
 
+    # URL attributes
     slug_field = 'nameSlug'
     slug_url_kwarg = 'nameSlug'
 
     def seller_detail_view(request, slug):
+        # Get Seller instance from Seller (slug) name
         seller = get_object_or_404(Seller, nameSlug=slug)
 
         # ~~~~~ Return Generated Values ~~~~~
         context = {
             'seller': seller,
         }
+        # Redirect to Seller Detail Page
         return render(request, 'knockoffKing/seller_detail.html', context=context)
         # ~~~~~
 # ~~~~~
@@ -144,62 +185,48 @@ def logout_view(request):
 def register_view(request):
     print("TEST1")
     if request.method == 'POST':
-        # Get the form data
+
+        # Get the form attributes
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user_type = request.POST.get('usrTypeIn')
-        print("TEST2")
+        user_type = request.POST.get('usrTypeSelect')
         
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
-            print("TEST3")
+            # Redirect to register page if email already exists
             return render(request, 'knockoffKing/register.html', {'error': 'Email already in use'})
             
-        # Create the user object but do not save it yet
-        user = User(first_name=first_name, last_name=last_name, email=email, username=email)
-        user.set_password(password)
-        print("TEST4")
-        # Save the user object to the database
-        user.save()
+        # ~~~ Django User
+        user = User(first_name=first_name, last_name=last_name, email=email, username=email) # Create user object
+        user.set_password(password) # Set user object password
+        user.save() # Save user object
 
-        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
-        usermodel.setPass(password)
-        usermodel.save()
-        print("user_type:",user_type)
+        # ~~~ User Model
+        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name) # Create user model instance
+        usermodel.setPass(password) # Set user model instance password
+        usermodel.save() # Save user model instance
 
+        # Check user type (Customer or Seller)
         if user_type == 'Customer':
-            print("customer1")
-            customer = Customer(user=usermodel)
-            print("customer2")
-            customer.save()
-            print("customer3")
-            group = Group.objects.get(name='Customer')  # Change this to 'Customer' instead of 'Buyer'
-            print("customer4")
-            group.user_set.add(user)  # Add the user to the group
-            print("customer5")
-            group.save()
-            print("Customer group:", group)
+            customer = Customer(user=usermodel) # Create user model instance 
+            customer.save() # Save user model instance as customer
+            group = Group.objects.get(name='Customer') # Get Customer group
+            group.user_set.add(user)  # Add buyer to Customer group
+            group.save() # Save group
+
         elif user_type == 'Seller':
-            print("seller1")
-            seller = Seller(user=usermodel)
-            print("seller2")
-            seller.save()
-            print("seller3")
-            group = Group.objects.get(name='Seller')
-            print("seller4")
-            group.user_set.add(user)  # Add the user to the group
-            print("seller5")
-            group.save()
-            print("Seller group:", group)
+            seller = Seller(user=usermodel) # Create user model instance
+            seller.save() # Save user model instance as seller
+            group = Group.objects.get(name='Seller') # Get seller group
+            group.user_set.add(user)  # Add seller to Seller group
+            group.save() # Save group
 
-            
-
-        
-        # Redirect to success page
-        return render(request, 'knockoffKing/home.html', {'user': user})
-    print("TEST5")
+        # Redirect to home page if success
+        return redirect('home')
+    
+    # Redirect to register page if invalid form
     return render(request, 'knockoffKing/register.html')
 # ~~~~~~~~~~~~~~~~~~~~
 
