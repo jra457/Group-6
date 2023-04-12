@@ -9,6 +9,7 @@ from django.contrib.auth.models import Group
 
 
 
+# ~~~~~~~~~~ Home View ~~~~~~~~~~
 def Home(request):
     # Check for [HTTP] POST method
     if request.method == 'POST':
@@ -71,6 +72,7 @@ def Home(request):
     sports_world = Seller.objects.get(name='Sports World')
     equipment_list = Product.objects.filter(seller=sports_world)[:4]
     
+    
 
     context = {
         'sellerList': sellerList,
@@ -87,7 +89,59 @@ def Home(request):
     }
 
     return render(request, 'knockoffKing/home.html', context=context)
+# ~~~~~
 
+
+
+# ~~~~~~~~~~ Orders View ~~~~~~~~~~
+def orders_view(request):
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+
+    }
+    return render(request, 'knockoffKing/orders.html', context=context)
+    # ~~~~~
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Cart View ~~~~~~~~~~
+def cart_view(request):
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+
+    }
+    return render(request, 'knockoffKing/cart.html', context=context)
+    # ~~~~~
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Products View ~~~~~~~~~~
+def products_view(request):
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+
+    }
+    return render(request, 'knockoffKing/products.html', context=context)
+    # ~~~~~
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Profile View ~~~~~~~~~~
+def profile_view(request):
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+
+    }
+    return render(request, 'knockoffKing/profile.html', context=context)
+    # ~~~~~
+# ~~~~~
 
 
 
@@ -137,10 +191,21 @@ class SellerDetailView(generic.DetailView):
     slug_field = 'nameSlug'
     slug_url_kwarg = 'nameSlug'
 
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     # Get UUID of logged-in user and add it to the context
+    #     if self.request.user.is_authenticated:
+    #         email = self.request.user.username
+            
+    #         seller = Seller.objects.get(email=email)
+    #         context['user_uuid'] = seller.__uuid__
+    #     return context
+    
     def seller_detail_view(request, slug):
         # Get Seller instance from Seller (slug) name
         seller = get_object_or_404(Seller, nameSlug=slug)
-        
+        print("test")
+        print("seller.id:", seller.id)
         # ~~~~~ Return Generated Values ~~~~~
         context = {
             'seller': seller,

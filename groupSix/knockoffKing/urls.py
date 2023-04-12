@@ -14,8 +14,12 @@ from django.conf.urls.static import static
 # ~~~~~ URLs ~~~~~
 urlpatterns = [
 
-    # Home
+    # Navbar
     path('', views.Home, name='home'),
+    path('orders/', views.orders_view, name='orders'),
+    path('cart/', views.cart_view, name='cart'),
+    path('products/', views.products_view, name='products'),
+    path('profile/', views.profile_view, name='profile'),
 
     # Users
     path('admin/', views.admin_view, name='admin'),

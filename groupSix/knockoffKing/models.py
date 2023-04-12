@@ -141,6 +141,10 @@ class Seller(models.Model):
         """String for representing the Model object."""
         return f'{self.name}, {self.user.email}'
     
+    def __uuid__(self):
+        return self.user.id
+
+    
     class Meta:
         ordering = ['name', 'user__email']
 # ~~~~~
