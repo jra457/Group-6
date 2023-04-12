@@ -33,7 +33,7 @@
 
           <!-- Orders Link -->
           <li>
-            <a href="#" class="nav-link text-white">
+            <a href="{% url 'orders' %}" class="nav-link text-white">
               <!-- Orders SVG Image -->
               <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#truck"></use></svg>
               Orders
@@ -43,7 +43,7 @@
 
           <!-- Cart Link -->
           <li>
-            <a href="#" class="nav-link text-white">
+            <a href="{% url 'cart' %}" class="nav-link text-white">
               <!-- Products SVG Image -->
               <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#cart"></use></svg>
               Cart
@@ -51,9 +51,19 @@
           </li>
           <!-- Cart Link -->
 
+          <!-- Products Link -->
+          <li>
+            <a href="{% url 'products' %}" class="nav-link text-white">
+              <!-- Products SVG Image -->
+              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#grid"></use></svg>
+              Products
+            </a>
+          </li>
+          <!-- Products Link -->
+
           <!-- Store Link -->
           <li>
-            <a href="#" class="nav-link text-white">
+            <a href="{{ seller.get_absolute_url }}" class="nav-link text-white">
               <!-- Products SVG Image -->
               <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#shop"></use></svg>
               Store
@@ -63,7 +73,7 @@
 
           <!-- Profile Link -->
           <li>
-            <a href="{% url 'customer' %}" class="nav-link text-white">
+            <a href="{% url 'profile' %}" class="nav-link text-white">
               <!-- Customer SVG Image -->
               <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#people-circle"></use></svg>
               Profile
