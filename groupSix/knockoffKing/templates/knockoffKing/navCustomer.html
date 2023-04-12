@@ -11,10 +11,10 @@
         <a class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none" href="{% url 'home' %}">
           {% load static %}
           <img
-            src="{% static 'images/favicon.ico' %}"
-            height="35"
-            alt="Pengu"
-            loading="lazy"
+          src="{% static 'images/favicon.ico' %}"
+          height="35"
+          alt="Pengu"
+          loading="lazy"
           >
         </a>
 
@@ -31,45 +31,35 @@
           </li>
           <!-- Home Link -->
 
-          <!-- Dashboard Link -->
-          <li>
-            <a href="{% url 'dashboard' %}" class="nav-link text-white">
-              <!-- Dashboard SVG Image -->
-              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#speedometer2"></use></svg>
-              Dashboard
-            </a>
-          </li>
-          <!-- Dashboard Link -->
-
           <!-- Orders Link -->
           <li>
             <a href="#" class="nav-link text-white">
               <!-- Orders SVG Image -->
-              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#table"></use></svg>
+              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#truck"></use></svg>
               Orders
             </a>
           </li>
           <!-- Orders Link -->
 
-          <!-- Products Link -->
+          <!-- Cart Link -->
           <li>
             <a href="#" class="nav-link text-white">
               <!-- Products SVG Image -->
-              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#grid"></use></svg>
-              Products
+              <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#cart"></use></svg>
+              Cart
             </a>
           </li>
-          <!-- Products Link -->
+          <!-- Cart Link -->
 
-          <!-- Customers Link -->
+          <!-- Profile Link -->
           <li>
             <a href="{% url 'customer' %}" class="nav-link text-white">
               <!-- Customer SVG Image -->
               <svg class="bi d-block mx-auto mb-1" style="fill:white;" width="24" height="24"><use xlink:href="#people-circle"></use></svg>
-              Customers
+              Profile
             </a>
           </li>
-          <!-- Customers Link -->
+          <!-- Profile Link -->
 
         </ul>
         <!-- Navbar Links End -->
@@ -94,37 +84,18 @@
       </form>
       <!-- Navbar Search ~ Form ~ (End) -->
 
-
-
-      <!-- ~ IF ~ User is Valid -->
-      {% if user.is_authenticated %}
-      <!-- (Button) Logout -->
-      <a class="btn btn-primary" href="{% url 'logout' %}" role="button">Logout</a>
-      <!-- (Button) Logout -->
-      <!-- ~ IF ~ User -->
-
-
-
-      <!-- ~ ELSE ~ User is NOT Valid -->
-      {% else %}
       <div class="text-end">
 
-        <!-- (Button) Login -->
-        <a class="btn btn-primary" href="{% url 'login' %}" role="button">Login</a>
-        <!-- (Button) Login -->
-
-        <!-- (Button) Register -->
-        <a class="btn btn-primary" href="{% url 'register' %}" role="button">Register</a>
-        <!-- (Button) Register -->
+        <!-- (Button) Logout -->
+        <a class="btn btn-primary" href="{% url 'logout' %}" role="button">Logout</a>
+        <!-- (Button) Logout -->
 
       </div>
-      {% endif %}
-      <!-- ~ ELSE ~ User is NOT Valid -->
 
     </div>
   </div>
   <!-- Search, Login/Logout, and Register -->
 
-  </header>
+</header>
 
-  <!-- Navbar Module End -->
+<!-- Navbar Module End -->
