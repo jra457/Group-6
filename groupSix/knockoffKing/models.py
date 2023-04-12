@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password, check_password
 
-# Create your models here. acca cock and ball torture!!!!
+# Create your models here.
 
 # ~~~~~ User Model ~~~~~
 class UserModel(models.Model):
