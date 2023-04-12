@@ -137,10 +137,21 @@ class SellerDetailView(generic.DetailView):
     slug_field = 'nameSlug'
     slug_url_kwarg = 'nameSlug'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get UUID of logged-in user and add it to the context
+        if self.request.user.is_authenticated:
+            email = self.request.user.username
+            
+            seller = Seller.objects.get(email=email)
+            context['user_uuid'] = seller.__uuid__
+        return context
+    
     def seller_detail_view(request, slug):
         # Get Seller instance from Seller (slug) name
         seller = get_object_or_404(Seller, nameSlug=slug)
-        
+        print("test")
+        print("seller.id:", seller.id)
         # ~~~~~ Return Generated Values ~~~~~
         context = {
             'seller': seller,

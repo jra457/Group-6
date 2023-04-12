@@ -1,0 +1,32 @@
+
+
+{% load group_tags %} {# Load the custom filter #}
+
+
+
+{% if user|has_group:"Customer" %}
+
+    <!-- Customer Navbar -->
+
+    {% include 'knockoffKing/navCustomer.html' %}
+
+    <!-- Customer Navbar -->
+
+{% elif user|has_group:"Seller" %}
+
+    <!-- Seller Navbar -->
+
+    {% include 'knockoffking/navSeller.html' %}
+
+    <!-- Seller Navbar -->
+
+{% else %}
+
+    <!-- Guest Navbar -->
+
+    {% include 'knockoffking/navGuest.html' %}
+
+    <!-- Guest Navbar -->
+
+{% endif %}
+
