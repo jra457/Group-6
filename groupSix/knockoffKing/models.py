@@ -289,6 +289,17 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     items = models.ManyToManyField(Product, through='CartItem')
+
+    def get_total_price(self):
+        total = sum(item.price for item in self.items.all())
+        return total
+    
+    def add_item(self, product):
+        cart_item, created = CartItem.objects.get_or_create(shoppingCart=self, product=product)
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+        return cart_item
     
     def __str__(self):
         """String for representing the Model object."""
@@ -307,6 +318,9 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     
     dateAdded = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        return self.product.price * self.quantity
     
     def __str__(self):
         """String for representing the Model object."""

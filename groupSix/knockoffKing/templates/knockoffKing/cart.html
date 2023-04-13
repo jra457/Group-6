@@ -6,12 +6,51 @@
 
 <div class="container px-1 py-3" id="cartContainer">
 
-<!-- Cart Page Title -->
-<h2 class="pb-2 border-bottom" style="color:#999999">Cart Page</h2>
-<!-- Cart Page Title -->
+  <!-- Cart Page Title -->
+  <h2 class="pb-2 border-bottom" style="color:#999999">Cart Page</h2>
+  <!-- Cart Page Title -->
 
+  <!-- Cart Items -->
+  <div class="row">
+    <div class="col-md-8">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items.all %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>${{ item.product.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.total_price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
+    <!-- Cart Summary -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cart Summary</h5>
+          <p class="card-text">Subtotal: ${{ cart.get_total_price }}</p>
 
+          <a class="btn btn-primary btn-block">Checkout</a>
+          
+          
+        </div>
+      </div>
+    </div>
+    <!-- Cart Summary -->
+  </div>
+  <!-- Cart Items -->
 </div>
 
 <!-- Cart Page End -->

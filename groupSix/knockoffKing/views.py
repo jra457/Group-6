@@ -6,6 +6,7 @@ from django.views import generic
 from .models import *
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -116,6 +117,14 @@ def cart_view(request):
     return render(request, 'knockoffKing/cart.html', context=context)
     # ~~~~~
 # ~~~~~
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = ShoppingCart.objects.get_or_create(user=authenticate(request))
+    cart.add_item(product)
+    context = {'cart': cart}
+    return render(request, 'knockoffKing/cart.html', context=context)
 
 
 
