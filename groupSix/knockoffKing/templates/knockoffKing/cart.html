@@ -23,12 +23,12 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in cart.items.all %}
+          {% for product in cart %}
           <tr>
-            <td>{{ item.product.name }}</td>
-            <td>${{ item.product.price }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>${{ item.total_price }}</td>
+            <td>{{ product.name }}</td>
+            <td>${{ product.price }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>${{ product.total_price }}</td>
           </tr>
           {% endfor %}
         </tbody>

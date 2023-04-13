@@ -109,10 +109,25 @@ def orders_view(request):
 
 # ~~~~~~~~~~ Cart View ~~~~~~~~~~
 def cart_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+        except Customer.DoesNotExist:
+            pass
 
+        print("user_instance:", user_instance)
+        print("user_model_instance:", user_model_instance)
+
+        cart_instance = ShoppingCart.objects.get(user=user_model_instance)
+        cart = cart_instance.items.all()
+
+        print("cart_items:", cart_instance)
+        print("cart_items.items:", cart)
+        
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-
+        'cart': cart,
     }
     return render(request, 'knockoffKing/cart.html', context=context)
     # ~~~~~
@@ -120,12 +135,22 @@ def cart_view(request):
 
 @login_required
 def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart, created = ShoppingCart.objects.get_or_create(user=authenticate(request))
-    cart.add_item(product)
-    context = {'cart': cart}
-    return render(request, 'knockoffKing/cart.html', context=context)
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+        except Customer.DoesNotExist:
+            pass
 
+        print("user_instance:", user_instance)
+        print("user_model_instance:", user_model_instance)
+
+
+        product = get_object_or_404(Product, id=product_id)
+        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
+        cart.add_item(product)
+        context = {'cart': cart}
+    return render(request, 'knockoffKing/cart.html', context=context)
 
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
