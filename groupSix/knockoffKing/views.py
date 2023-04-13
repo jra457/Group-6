@@ -278,7 +278,7 @@ class SellerDetailView(generic.DetailView):
 def login_view(request):
     # Check for [HTTP] POST method
     if request.method == 'POST':
-
+        error = "None"
         # Fetch email & password
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -292,10 +292,10 @@ def login_view(request):
             return redirect('home')
         else:
             # Error output for invalid username || password
-            error = 'Invalid username or password'
+            error = 'cock and ball torture!'
     else:
         # If not [HTTP] POST, render login page
-        error = None
+        error = "None"
 
     # Redirect to login page for invalid username || password
     return render(request, 'knockoffKing/login.html', {'error': error})
@@ -318,8 +318,10 @@ def logout_view(request):
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
 def register_view(request):
     print("TEST1")
+    error = "None"
     if request.method == 'POST':
-
+        error = "None"
+        
         # Get the form attributes
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
@@ -330,7 +332,8 @@ def register_view(request):
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
             # Redirect to register page if email already exists
-            return render(request, 'knockoffKing/register.html', {'error': 'Email already in use'})
+            error = "Email already in use."
+            return render(request, 'knockoffKing/register.html', {'error': error})
             
         # ~~~ Django User
         user = User(first_name=first_name, last_name=last_name, email=email, username=email) # Create user object
@@ -361,7 +364,7 @@ def register_view(request):
         return redirect('home')
     
     # Redirect to register page if invalid form
-    return render(request, 'knockoffKing/register.html')
+    return render(request, 'knockoffKing/register.html', {'error': error})
 # ~~~~~~~~~~~~~~~~~~~~
 
 
