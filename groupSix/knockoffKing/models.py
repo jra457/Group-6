@@ -294,12 +294,25 @@ class ShoppingCart(models.Model):
         total = sum(item.price for item in self.items.all())
         return total
     
-    def add_item(self, product):
+    def add_item(self, product, quantity=1):
+    # Check if the product is already in the cart
         cart_item, created = CartItem.objects.get_or_create(shoppingCart=self, product=product)
-        if not created:
-            cart_item.quantity += 1
-            cart_item.save()
-        return cart_item
+
+        if created:
+            # If the item is newly created, set the quantity
+            cart_item.quantity = quantity
+        else:
+            # If the item already exists, update the quantity
+            cart_item.quantity += quantity
+
+        cart_item.save()
+
+    def remove_item(self, product):
+        cart_item = self.cartitem_set.filter(product=product).first()
+        if cart_item.quantity == 1:
+            cart_item.delete()
+        elif cart_item.quantity > 1:
+            cart_item.quantity -= 1
     
     def __str__(self):
         """String for representing the Model object."""

@@ -36,6 +36,7 @@ urlpatterns = [
     # Generic Views
     path('seller/<slug:nameSlug>', views.SellerDetailView.as_view(), name='seller-detail'),
     path('add-to-cart/<product_id>/', views.add_to_cart, name='add-to-cart'),
+    path('remove-from-cart/<uuid:product_id>/', views.remove_from_cart, name='remove_from_cart'),
 
     # Testing
     path('dashboard/', views.dashboard_view, name='dashboard'),
