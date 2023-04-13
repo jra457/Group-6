@@ -5,97 +5,135 @@
 <!-- Register Page Start -->
 
 <div class="container px-1 py-3" id="sellerContainer">
+    <div class="container">
+        <!-- Register Page Title -->
+        <h2 class="pb-2 border-bottom" style="color:#999999">Register</h2>
+        <!-- Register Page Title -->
 
-    <!-- Register Page Title -->
-    <h2 class="pb-2 border-bottom" style="color:#999999">Register</h2>
-    <!-- Register Page Title -->
+        {% if error != "None" %}
+        <div class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+        {% endif %}
 
-    <!-- Register Page ~ Form ~ (Start) -->
-    <form class="row g-3 needs-validation" novalidate method="post" action="/register/">
-        
-        {% csrf_token %}
+        <!-- Register Page ~ Form ~ (Start) -->
+        <form class="row g-3 needs-validation" method="post" action="/register/" novalidate>
 
-        <!-- (Input) First Name -->
-        <div class="col-md-4 position-relative">
-            <label for="first_name" class="form-label">First name</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
-            <div class="valid-tooltip">
-                Looks good!
+            {% csrf_token %}
+
+            <!-- (Input) First Name -->
+            <div class="col-md-4 position-relative">
+                <label for="first_name" class="form-label">First name</label>
+                <input type="text" class="form-control" id="first_name" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please enter a first name.
+                </div>              
             </div>
-        </div>
-        <!-- (Input) First Name -->
+            <!-- (Input) First Name -->
 
 
 
-        <!-- (Input) Last Name -->
-        <div class="col-md-4 position-relative">
-            <label for="last_name" class="form-label">Last name</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
-            <div class="valid-tooltip">
-                Looks good!
+            <!-- (Input) Last Name -->
+            <div class="col-md-4 position-relative">
+                <label for="last_name" class="form-label">Last name</label>
+                <input type="text" class="form-control" id="last_name" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please enter a last name.
+                </div>      
             </div>
-        </div>
-        <!-- (Input) Last Name -->
+            <!-- (Input) Last Name -->
 
 
 
-        <!-- (Input) Email -->
-        <div class="col-md-4 position-relative">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-            <div class="valid-tooltip">
-                Looks good!
+            <!-- (Input) Email -->
+            <div class="col-md-4 position-relative">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please provide a valid email.
+                </div>      
             </div>
-        </div>
-        <!-- (Input) Email -->
+            <!-- (Input) Email -->
 
 
 
-        <!-- (Input) Password -->
-        <div class="col-md-4 position-relative">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-            <div class="valid-tooltip">
-                Looks good!
+            <!-- (Input) Password -->
+            <div class="col-md-4 position-relative">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    Please provided a valid password.
+                </div>      
             </div>
-        </div>
-        <!-- (Input) Password -->
-
-        
-
-        <!-- (Input) User Type Hidden Field -->
-        <input type="hidden" name="usrTypeIn" id="usrTypeIn">
-        <!-- (Input) User Type Hidden Field -->
-
-        
-
-        <!-- (Input) User Type -->
-        <div class="col-md-4 position-relative">
-            <label for="usrTypeSelect" class="form-label">Select User Type</label>
-            <select class="form-select" id="usrTypeSelect" name="usrTypeSelect" required aria-describedby="validationMessage" required>
-                <option value="Customer">Customer</option>
-                <option value="Seller">Seller</option>
-            </select>
-            <div class="invalid-feedback" id="validationMessage">Please select a user type</div>
-        </div>
-        <!-- (Input) User Type -->
+            <!-- (Input) Password -->
 
 
 
-        <!-- (Button) Submit -->
-        <div class="col-12">
-            <button class="btn btn-primary" type="submit" aria-describedby="validationMessage">Register</button>
-        </div>
-        <!-- (Button) Submit -->
+            <!-- (Input) User Type Hidden Field -->
+            <input type="hidden" name="usrTypeIn" id="usrTypeIn" required>
+            <!-- (Input) User Type Hidden Field -->
 
-    </form>
-    <!-- Register Page ~ Form ~ (End) -->
 
+
+            <!-- (Input) User Type -->
+            <div class="col-md-4 position-relative">
+                <label for="usrTypeSelect" class="form-label">Select User Type</label>
+                <select class="form-select" id="usrTypeSelect" name="usrTypeSelect" required
+                    aria-describedby="validationMessage" required>
+                    <option value="Customer">Customer</option>
+                    <option value="Seller">Seller</option>
+                </select>
+                <div class="invalid-feedback" id="validationMessage">Please select a user type</div>
+            </div>
+            <!-- (Input) User Type -->
+
+
+
+            <!-- (Button) Submit -->
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">Register</button>
+            </div>
+            <!-- (Button) Submit -->
+
+        </form>
+        <!-- Register Page ~ Form ~ (End) -->
+    </div>
 </div>
 
 <!-- Register Page End -->
 
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+
 {% endblock %}
-
-
-

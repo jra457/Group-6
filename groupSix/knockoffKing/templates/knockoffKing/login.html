@@ -2,55 +2,60 @@
 
 {% block content %}
 
-  <!-- Login Page (Start) -->
+<!-- Login Page (Start) -->
 
 <div class="container px-1 py-3" id="sellerContainer">
-
-  <!-- Login Page Title -->
-  <h2 class="pb-2 border-bottom" style="color:#999999">Login</h2>
-  <!-- Login Page Title -->
-
-  <!-- Login Page ~ Form ~ (Start) -->
-  <form class="row g-3 needs-validation" novalidate method="post" action="/login/">
-
-    {% csrf_token %}
-
-    <!-- (Input) Email -->
-    <div class="col-md-4 position-relative">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" class="form-control" id="email" name="email" required>
-      <div class="valid-tooltip">
-          Looks good!
-      </div>
-    </div>
-    <!-- (Input) Email -->
-
+  <div class="container">
+    <!-- Login Page Title -->
+    <h2 class="pb-2 border-bottom" style="color:#999999">Login</h2>
+    <!-- Login Page Title -->
     
+    {% if error != "None" %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+    {% endif %}
     
-    <!-- (Input) Password -->
-    <div class="col-md-4 position-relative">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" class="form-control" id="password" name="password" required>
-      <div class="valid-tooltip">
+    <!-- Login Page ~ Form ~ (Start) -->
+    <form class="row g-3 needs-validation" novalidate method="post" action="/login/">
+
+      {% csrf_token %}
+
+      <!-- (Input) Email -->
+      <div class="col-md-4 position-relative">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+        <div class="valid-tooltip">
           Looks good!
+        </div>
       </div>
-    </div>
-    <!-- (Input) Password -->
+      <!-- (Input) Email -->
 
 
 
-    <!-- (Button) Submit -->
-    <div class="col-12">
-      <button class="btn btn-primary" type="submit">Login</button>
-    </div>
-    <!-- (Button) Submit -->
+      <!-- (Input) Password -->
+      <div class="col-md-4 position-relative">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+        <div class="valid-tooltip">
+          Looks good!
+        </div>
+      </div>
+      <!-- (Input) Password -->
 
-  </form>
-  <!-- Login Page ~ Form ~ (End) -->
 
+
+      <!-- (Button) Submit -->
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Login</button>
+      </div>
+      <!-- (Button) Submit -->
+
+    </form>
+    <!-- Login Page ~ Form ~ (End) -->
+  </div>
 </div>
 
-  <!-- Login Page (End) -->
+<!-- Login Page (End) -->
 
 {% endblock %}
-
