@@ -169,9 +169,7 @@ def remove_from_cart(request, product_id):
         product = get_object_or_404(Product, id=product_id)
         cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
 
-        quantity = request.POST.get('quantity', 1)
-
-        cart.remove_item(product, quantity)
+        cart.remove_item(product)
         context = {'cart': cart}
     return render(request, 'knockoffKing/cart.html', context=context)
 

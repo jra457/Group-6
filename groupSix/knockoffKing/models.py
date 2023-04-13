@@ -313,6 +313,8 @@ class ShoppingCart(models.Model):
             cart_item.delete()
         elif cart_item.quantity > 1:
             cart_item.quantity -= 1
+
+        cart_item.save()
     
     def __str__(self):
         """String for representing the Model object."""
