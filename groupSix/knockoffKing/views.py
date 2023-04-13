@@ -145,10 +145,31 @@ def add_to_cart(request, product_id):
         print("user_instance:", user_instance)
         print("user_model_instance:", user_model_instance)
 
+        product = get_object_or_404(Product, id=product_id)
+        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
+
+        quantity = request.POST.get('quantity', 1)
+
+        cart.add_item(product, quantity)
+        context = {'cart': cart}
+    return render(request, 'knockoffKing/cart.html', context=context)
+
+@login_required
+def remove_from_cart(request, product_id):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+        except Customer.DoesNotExist:
+            pass
+
+        print("user_instance:", user_instance)
+        print("user_model_instance:", user_model_instance)
 
         product = get_object_or_404(Product, id=product_id)
         cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
-        cart.add_item(product)
+
+        cart.remove_item(product)
         context = {'cart': cart}
     return render(request, 'knockoffKing/cart.html', context=context)
 
