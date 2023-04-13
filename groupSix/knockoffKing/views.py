@@ -176,10 +176,31 @@ def remove_from_cart(request, product_id):
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
 def products_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            seller_model_instance = Seller.objects.get(user=user_model_instance)
+        except Customer.DoesNotExist:
+            pass
 
+        print("user_instance:", user_instance)
+        print("user_model_instance:", user_model_instance)
+        print("seller_model_instance:", seller_model_instance)
+
+        product_list = Product.objects.filter(seller=seller_model_instance)
+
+        product_test = Product.objects.filter(seller=seller_model_instance)[:1]
+        product_test = product_test[0]
+        print("product_list:", product_list)
+        print("product_test:", product_test)
+
+        print("test", product_test.get_absolute_url())
+        
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-
+        'product_list': product_list,
+        'product_test': product_test,
     }
     return render(request, 'knockoffKing/products.html', context=context)
     # ~~~~~
@@ -268,6 +289,48 @@ class SellerDetailView(generic.DetailView):
         # Redirect to Seller Detail Page
         return render(request, 'knockoffKing/seller_detail.html', context=context)
         # ~~~~~
+# ~~~~~
+
+
+
+# ~~~~~ Seller Detail View ~~~~~
+class ProductDetailView(generic.DetailView):
+    model = Product
+
+    def product_detail_view(request, primary_key):
+        product = get_object_or_404(Product, pk=primary_key)
+        context = {
+        'product': product,
+        }
+        return render(request, 'knockoffKing/product_detail.html', context=context)
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Update Product ~~~~~~~~~~
+def update_product_view(request, product_id):
+    if request.method == 'POST':
+        # Fetch email & password
+        newName = request.POST.get('newName')
+        newPrice = request.POST.get('newPrice')
+        newQuantity = request.POST.get('newQuantity')
+
+        print("newName:", newName)
+        print("newPrice:", newPrice)
+        print("newQuantity:", newQuantity)
+
+    product = Product.objects.get(pk=product_id)
+    
+    product.name = newName
+    product.price = newPrice
+    product.quantity = newQuantity
+    product.save()
+    print("product:", product)
+    print("product.name:", product.name)
+    print("product.price:", product.price)
+    print("product.quantity:", product.quantity)
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~
 
 

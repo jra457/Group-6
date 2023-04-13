@@ -89,6 +89,10 @@ class Product(models.Model):
     
     def __str__(self):
         return f'{self.seller.name}, {self.name}, ${self.price} ({self.quantity})'
+    
+    def get_absolute_url(self):
+        """Returns the url to access a particular location instance."""
+        return reverse('product-detail', args=[str(self.id)])
 # ~~~~~
 
 

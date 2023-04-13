@@ -33,7 +33,7 @@
                     <div class="text-center">
                         <button class="btn btn-primary" type="submit">Add to Cart</button>
                         {% if user|has_group:"Seller" %}
-                        <a class="btn btn-secondary" href="#" role="button">Update</a>
+                        <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
                         <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
                         {% endif %}
                     </div>
