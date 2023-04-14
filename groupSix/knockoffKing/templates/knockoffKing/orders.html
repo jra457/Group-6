@@ -1,19 +1,27 @@
-{% extends 'knockoffKing/index.html' %}
+{% extends "knockoffKing/index.html" %}
 
 {% block content %}
-
-<!-- Orders Page Start -->
-
-<div class="container px-1 py-3" id="ordersContainer">
-
-<!-- Orders Page Title -->
-<h2 class="pb-2 border-bottom" style="color:#999999">Orders Page</h2>
-<!-- Orders Page Title -->
-
-
-
-</div>
-
-<!-- Orders Page End -->
-
+    <h1>Order History</h1>
+    {% if order_history %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date Created</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for history_item in order_history %}
+                    <tr>
+                        <td>{{ history_item.order.id }}</td>
+                        <td>{{ history_item.order.dateCreated }}</td>
+                        <td>{{ history_item.order.get_status_display }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no order history.</p>
+    {% endif %}
 {% endblock %}
