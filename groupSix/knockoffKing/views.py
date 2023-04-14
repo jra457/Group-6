@@ -450,7 +450,7 @@ def order_history_view(request):
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
         order_history = OrderHistory.objects.filter(user=user_model_instance)
-
+        print("test")
         context = {'order_history': order_history}
         return render(request, 'knockoffKing/orders.html', context=context)
     else:
