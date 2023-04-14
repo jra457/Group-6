@@ -123,11 +123,10 @@ def cart_view(request):
         cart = cart_instance.items.all()
 
         print("cart_items:", cart_instance)
-        print("cart_items.items:", cart)
         
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-        'cart': cart,
+        'cart': cart_instance,
     }
     return render(request, 'knockoffKing/cart.html', context=context)
     # ~~~~~
@@ -152,7 +151,7 @@ def add_to_cart(request, product_id):
 
         cart.add_item(product, quantity)
         context = {'cart': cart}
-    return render(request, 'knockoffKing/cart.html', context=context)
+    return redirect('home')
 
 @login_required
 def remove_from_cart(request, product_id):
@@ -170,8 +169,64 @@ def remove_from_cart(request, product_id):
         cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
 
         cart.remove_item(product)
-        context = {'cart': cart}
-    return render(request, 'knockoffKing/cart.html', context=context)
+    return redirect('cart')
+
+
+
+# ~~~~~~~~~~ Checkout View ~~~~~~~~~~
+@login_required
+def checkout_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        user_model_instance = UserModel.objects.get(user=user_instance)
+
+        cart_instance = ShoppingCart.objects.get(user=user_model_instance)
+
+        # Create a new order
+        order = Order()
+        order.save()
+
+        # Copy items from the cart to the order
+        for cart_item in cart_instance.cartitem_set.all():
+            order_item = OrderItem()
+            order_item.order = order
+            order_item.product = cart_item.product
+            order_item.quantity = cart_item.quantity
+            order_item.save()
+
+        # Calculate the total price for the order
+        order.total_price = cart_instance.get_total_price()
+        order.save()
+
+        # Clear the shopping cart
+        cart_instance.items.clear()
+
+        # Add order to order history
+        order_history = OrderHistory(user=user_model_instance, order=order)
+        order_history.save()
+
+        context = {'order': order}
+        return render(request, 'knockoffKing/checkout.html', context=context)
+    else:
+        return redirect('login')
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Order History View ~~~~~~~~~~
+@login_required
+def order_history_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        order_history = OrderHistory.objects.filter(user=user_model_instance)
+
+        context = {'order_history': order_history}
+        return render(request, 'knockoffKing/orders.html', context=context)
+    else:
+        return redirect('login')
+# ~~~~~
+
 
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~

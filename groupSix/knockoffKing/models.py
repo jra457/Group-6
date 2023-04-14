@@ -155,27 +155,6 @@ class Seller(models.Model):
 
 
 
-# ~~~~~ Order Details Model ~~~~~
-class OrderDetails(models.Model):
-    """Model representing the Order Details."""
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
-
-    quantity = models.IntegerField(default=1)
-
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-
-    subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-
-    def getTotal(self):
-        return self.quantity * self.price
-
-    def __str__(self):
-        """String for representing the Model object."""
-        return self.product.name
-# ~~~~~
-
-
-
 # ~~~~~ Shipping Info Model ~~~~~
 class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
@@ -250,6 +229,8 @@ class Order(models.Model):
     """Model representing the Order."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
+    items = models.ManyToManyField(Product, through='OrderItem')
+
     dateCreated = models.DateTimeField(auto_now_add=True)
 
     dateShipped = models.DateField(null=True, blank=True)
@@ -285,6 +266,51 @@ class Order(models.Model):
 
 
 
+# ~~~~~ Order Item Model ~~~~~
+class OrderItem(models.Model):
+    """Model representing a specific Item in an Order."""
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    quantity = models.PositiveIntegerField(default=1)
+    
+    dateAdded = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        return self.product.price * self.quantity
+    
+    def __str__(self):
+        """String for representing the Model object."""
+        return f'{self.quantity}x {self.product} in {self.order}'
+# ~~~~~
+
+
+
+# ~~~~~ Order History Model ~~~~~
+class OrderHistory(models.Model):
+    """Model representing the Order Details."""
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
+
+    quantity = models.IntegerField(default=1)
+
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+    subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+    def getTotal(self):
+        return self.quantity * self.price
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return self.product.name
+# ~~~~~
+
+
+
 # ~~~~~ Shopping Cart Model ~~~~~
 class ShoppingCart(models.Model):
     """Model representing the Shopping Cart."""
@@ -295,7 +321,7 @@ class ShoppingCart(models.Model):
     items = models.ManyToManyField(Product, through='CartItem')
 
     def get_total_price(self):
-        total = sum(item.price for item in self.items.all())
+        total = sum(cart_item.total_price() for cart_item in self.cartitem_set.all())
         return total
     
     def add_item(self, product, quantity=1):
@@ -318,7 +344,7 @@ class ShoppingCart(models.Model):
         elif cart_item.quantity > 1:
             cart_item.quantity -= 1
 
-        cart_item.save()
+            cart_item.save()
     
     def __str__(self):
         """String for representing the Model object."""

@@ -48,7 +48,7 @@
           <h5 class="card-title">Cart Summary</h5>
           <p class="card-text">Subtotal: ${{ cart.get_total_price }}</p>
 
-          <a class="btn btn-primary btn-block">Checkout</a>
+          <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">Checkout</a>
           
           
         </div>

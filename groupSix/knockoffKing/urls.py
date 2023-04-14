@@ -16,7 +16,7 @@ urlpatterns = [
 
     # Navbar
     path('', views.Home, name='home'),
-    path('orders/', views.orders_view, name='orders'),
+    path('orders/', views.order_history_view, name='orders'),
     path('cart/', views.cart_view, name='cart'),
     path('products/', views.products_view, name='products'),
     path('profile/', views.profile_view, name='profile'),
@@ -39,6 +39,8 @@ urlpatterns = [
     path('product/<uuid:pk>', views.ProductDetailView.as_view(), name='product-detail'),
     path('add-to-cart/<product_id>/', views.add_to_cart, name='add-to-cart'),
     path('remove-from-cart/<uuid:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('order_history/', views.order_history_view, name='order_history_view'),
 
     # Testing
     path('dashboard/', views.dashboard_view, name='dashboard'),
