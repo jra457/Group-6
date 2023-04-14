@@ -65,23 +65,9 @@ class Product(models.Model):
 
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE, null=True, blank=True, help_text='Select the Product.')
 
-    # category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name='products', null=True, blank=True, help_text='Select the product Category.')
-
-    # review = models.IntegerField(default=0)
-
-    # numReviews = models.IntegerField(default=0)
-
     created = models.DateTimeField(auto_now_add=True)
 
     updated = models.DateTimeField(auto_now=True)
-
-    # def getReviewVal(self):
-    #     return self.review
-
-    # def updateReview(self, reviewIn):
-    #     self.numReviews = self.numReviews + 1
-    #     self.review = (self.review + reviewIn) / self.numReviews
-    #     return
 
     def getName(self):
         """String for representing the Model object."""
