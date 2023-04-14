@@ -181,6 +181,7 @@ def products_view(request):
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
             seller_model_instance = Seller.objects.get(user=user_model_instance)
+            seller = seller_model_instance
         except Customer.DoesNotExist:
             pass
 
@@ -199,8 +200,8 @@ def products_view(request):
         
     # ~~~~~ Return Generated Values ~~~~~
     context = {
+        'seller': seller,
         'product_list': product_list,
-        'product_test': product_test,
     }
     return render(request, 'knockoffKing/products.html', context=context)
     # ~~~~~
