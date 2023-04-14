@@ -14,35 +14,35 @@ from django.conf.urls.static import static
 # ~~~~~ URLs ~~~~~
 urlpatterns = [
 
-    # Navbar
+    # ~ Home
     path('', views.Home, name='home'),
-    path('orders/', views.order_history_view, name='orders'),
-    path('cart/', views.cart_view, name='cart'),
-    path('products/', views.products_view, name='products'),
-    path('profile/', views.profile_view, name='profile'),
 
-    # Users
-    path('admin/', views.admin_view, name='admin'),
-    path('customer/', views.customer_view, name='customer'),
-    path('seller/', views.seller_view, name='seller'),
-
-    # Sequences
+    # ~ Login/out & Register
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
-    path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
-    path('update_product/<product_id>', views.update_product_view, name='update-product'),
-    
 
-    # Generic Views
+    # ~ Profile
+    path('profile/', views.profile_view, name='profile'),
+
+    # ~ Stores
     path('seller/<slug:nameSlug>', views.seller_detail_view, name='seller-detail'),
+
+    # ~ Products
+    path('products/', views.products_view, name='products'),
     path('product/<uuid:pk>', views.ProductDetailView.as_view(), name='product-detail'),
+    path('update_product/<product_id>', views.update_product_view, name='update-product'),
+    path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
+    
+    # ~ Cart
+    path('cart/', views.cart_view, name='cart'),
     path('add-to-cart/<product_id>/', views.add_to_cart, name='add-to-cart'),
     path('remove-from-cart/<uuid:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+
+    # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
+    path('orders/', views.order_history_view, name='orders'),
     path('order_history/', views.order_history_view, name='order_history_view'),
 
-    # Testing
-    path('dashboard/', views.dashboard_view, name='dashboard'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # ~~~~~
