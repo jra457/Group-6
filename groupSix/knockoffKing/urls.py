@@ -31,10 +31,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
     path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
+    path('update_product/<product_id>', views.update_product_view, name='update-product'),
     
 
     # Generic Views
-    path('seller/<slug:nameSlug>', views.SellerDetailView.as_view(), name='seller-detail'),
+    path('seller/<slug:nameSlug>', views.seller_detail_view, name='seller-detail'),
+    path('product/<uuid:pk>', views.ProductDetailView.as_view(), name='product-detail'),
     path('add-to-cart/<product_id>/', views.add_to_cart, name='add-to-cart'),
     path('remove-from-cart/<uuid:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('checkout/', views.checkout_view, name='checkout'),

@@ -7,16 +7,13 @@
 <!-- Seller Detail Page Start -->
 
 <div class="container px-1 py-3" id="sellerDetailContainer">
-
-    <h1>{{ seller.name }}</h1>
-    {% if user_uuid %}
-      <p>UUID: {{ user_uuid }}</p>
-    {% else %}
-      <p>You are not logged in</p>
-    {% endif %}
     
     <!-- Seller Detail Page Title -->
-    <h2 class="pb-2 border-bottom" style="color:#999999">{{ seller.user.id }}</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">1{{ seller.user.id }}</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">2{{ user_instance }}</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">3{{ user.action_time }}</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">4{{ user.password }}</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">5{{ usermodel.getUserID }}</h2>
     <!-- Seller Detail Page Title -->
 
     <!-- Seller Product Grid -->
@@ -32,9 +29,11 @@
 
                     <div class="text-center">
                         <button class="btn btn-primary" type="submit">Add to Cart</button>
-                        {% if user|has_group:"Seller" %}
-                        <a class="btn btn-secondary" href="#" role="button">Update</a>
+                        {% if usermodel != "NoneType" %}
+                        {% if usermodel.getUserID == seller.user.id %}
+                        <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
                         <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
+                        {% endif %}
                         {% endif %}
                     </div>
 

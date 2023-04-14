@@ -231,10 +231,32 @@ def order_history_view(request):
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
 def products_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            seller_model_instance = Seller.objects.get(user=user_model_instance)
+            seller = seller_model_instance
+        except Customer.DoesNotExist:
+            pass
 
+        print("user_instance:", user_instance)
+        print("user_model_instance:", user_model_instance)
+        print("seller_model_instance:", seller_model_instance)
+
+        product_list = Product.objects.filter(seller=seller_model_instance)
+
+        product_test = Product.objects.filter(seller=seller_model_instance)[:1]
+        product_test = product_test[0]
+        print("product_list:", product_list)
+        print("product_test:", product_test)
+
+        print("test", product_test.get_absolute_url())
+        
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-
+        'seller': seller,
+        'product_list': product_list,
     }
     return render(request, 'knockoffKing/products.html', context=context)
     # ~~~~~
@@ -294,35 +316,104 @@ def seller_view(request):
 
 
 # ~~~~~ Seller Detail View ~~~~~
-class SellerDetailView(generic.DetailView):
-    model = Seller
+def seller_detail_view(request, nameSlug):
+    # current_user = None
+    # seller = None
+    # user = None
+    # usermodel = None
 
-    # URL attributes
-    slug_field = 'nameSlug'
-    slug_url_kwarg = 'nameSlug'
+    # if request.user.is_authenticated:
+    #     current_user = request.user
+    # try:
+    #     usermodel = UserModel.objects.get(user=current_user)
+    # except UserModel.DoesNotExist:
+    #     pass
+    user_instance = None
+    user_model_instance = None
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            user_test = user_model_instance.user
+            group = user_test.groups.first()
+            if group:
+                group_name = group.name
+            else:
+                group_name = None
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     # Get UUID of logged-in user and add it to the context
-    #     if self.request.user.is_authenticated:
-    #         email = self.request.user.username
-            
-    #         seller = Seller.objects.get(email=email)
-    #         context['user_uuid'] = seller.__uuid__
-    #     return context
-    
-    def seller_detail_view(request, slug):
-        # Get Seller instance from Seller (slug) name
-        seller = get_object_or_404(Seller, nameSlug=slug)
-        print("test")
-        print("seller.id:", seller.id)
-        # ~~~~~ Return Generated Values ~~~~~
+            # Check if the user is a Seller
+            try:
+                seller = Seller.objects.get(user=user_model_instance)
+                seller_name = seller.name
+
+            # If the user is not a Seller, try to find a Customer instance
+            except Seller.DoesNotExist:
+                try:
+                    customer = Customer.objects.get(user=user_model_instance)
+                    customer_name = customer.user.firstName
+
+                except Customer.DoesNotExist:
+                    pass
+
+        except UserModel.DoesNotExist:
+            print("USER DOES NOT EXIST")
+            pass
+    # Get Seller instance from Seller (slug) name
+    seller = get_object_or_404(Seller, nameSlug=nameSlug)
+
+    # print("usermodel.getUserID():", usermodel.getUserID())
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'seller': seller,
+        # 'current_user': user_instance,
+        'user': user_instance,  # Pass the 'User' object to the context
+        'usermodel': user_model_instance,  # You can still pass the 'UserModel' object if needed
+    }
+    # Redirect to Seller Detail Page
+    return render(request, 'knockoffKing/seller_detail.html', context=context)
+# ~~~~~
+
+
+
+# ~~~~~ Seller Detail View ~~~~~
+class ProductDetailView(generic.DetailView):
+    model = Product
+
+    def product_detail_view(request, primary_key):
+        product = get_object_or_404(Product, pk=primary_key)
         context = {
-            'seller': seller,
+        'product': product,
         }
-        # Redirect to Seller Detail Page
-        return render(request, 'knockoffKing/seller_detail.html', context=context)
-        # ~~~~~
+        return render(request, 'knockoffKing/product_detail.html', context=context)
+# ~~~~~
+
+
+
+# ~~~~~~~~~~ Update Product ~~~~~~~~~~
+def update_product_view(request, product_id):
+    if request.method == 'POST':
+        # Fetch email & password
+        newName = request.POST.get('newName')
+        newPrice = request.POST.get('newPrice')
+        newQuantity = request.POST.get('newQuantity')
+
+        print("newName:", newName)
+        print("newPrice:", newPrice)
+        print("newQuantity:", newQuantity)
+
+    product = Product.objects.get(pk=product_id)
+    
+    product.name = newName
+    product.price = newPrice
+    product.quantity = newQuantity
+    product.save()
+    print("product:", product)
+    print("product.name:", product.name)
+    print("product.price:", product.price)
+    print("product.quantity:", product.quantity)
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~
 
 

@@ -5,13 +5,44 @@
 <!-- Products Page Start -->
 
 <div class="container px-1 py-3" id="productsContainer">
+    <div class="container">
+        <!-- Products Page Title -->
+        <h2 class="pb-2 border-bottom" style="color:#999999">Products Page</h2>
+        <!-- Products Page Title -->
 
-<!-- Products Page Title -->
-<h2 class="pb-2 border-bottom" style="color:#999999">Products Page</h2>
-<!-- Products Page Title -->
+        
+
+        <table class="table table-hover">
+            <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Added</th>
+            <th scope="col">Last Updated</th>
+            <th scope="col">Update</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for product in product_list %}
+          <tr>
+            <th scope="row">1</th>
+            <td>{{ product.name }}</td>
+            <td>${{ product.price }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.created }}</td>
+            <td>{{ product.updated }}</td>
+            <td><a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm" role="button">Update</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      
+        </table>
 
 
-
+    </div>
 </div>
 
 <!-- Products Page End -->
