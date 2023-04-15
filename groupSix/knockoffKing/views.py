@@ -10,9 +10,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 
 
-
 # ~~~~~~~~~~ Home View ~~~~~~~~~~
 def Home(request):
+
+    book_nook = Seller.objects.get(name='Book Nook')
+    book_list = Product.objects.filter(seller=book_nook)[:4]
+
+    sports_world = Seller.objects.get(name='Sports World')
+    equipment_list = Product.objects.filter(seller=sports_world)[:4]
+
     # Check for [HTTP] POST method
     if request.method == 'POST':
 
@@ -26,7 +32,7 @@ def Home(request):
         if user is not None:
             # Login user with credentials
             login(request, user)
-
+            print("REDIRECT")
             # Redirect user to home
             return redirect('home')
 
@@ -37,10 +43,11 @@ def Home(request):
     seller = None
     user_test = None
     group_name = None
-
+    print("TEST1")
     if request.user.is_authenticated:
         user_instance = request.user
         try:
+            print("TEST2")
             user_model_instance = UserModel.objects.get(user=user_instance)
             user_test = user_model_instance.user
             group = user_test.groups.first()
@@ -51,36 +58,55 @@ def Home(request):
 
             # Check if the user is a Seller
             try:
+                print("TEST3")
                 seller = Seller.objects.get(user=user_model_instance)
                 seller_name = seller.name
 
             # If the user is not a Seller, try to find a Customer instance
             except Seller.DoesNotExist:
                 try:
+                    print("TEST4")
                     customer = Customer.objects.get(user=user_model_instance)
                     customer_name = customer.user.firstName
 
                 except Customer.DoesNotExist:
+                    print("TEST5")
                     pass
 
         except UserModel.DoesNotExist:
             print("USER DOES NOT EXIST")
             pass
 
-    book_nook = Seller.objects.get(name='Book Nook')
-    book_list = Product.objects.filter(seller=book_nook)[:4]
+    else:
+        print("TEST6")
+        # ~~~~~ Return Generated Values ~~~~~
+        context = {
+            'seller': seller,
 
-    sports_world = Seller.objects.get(name='Sports World')
-    equipment_list = Product.objects.filter(seller=sports_world)[:4]
-    
-    
+            'book_nook': book_nook,
+            'book_list': book_list,
+
+            'sports_world': sports_world,
+            'equipment_list': equipment_list,
+        }
+
+        return render(request, 'knockoffKing/home.html', context=context)
+
+    print("TEST7")
+    print("request.user:", request.user)
+    # print("usermodel.getUserID:", user_model_instance.getUserID())
+    # print("seller.user.id", seller.user.id)
+    # print("book_list[0].seller:", book_list[0].seller.user_id)
+    # print("user_instance.id", user_instance.id)
+    print("TEST8")
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-        'sellerList': sellerList,
-        'customer': customer,
+        # 'sellerList': sellerList,
+        # 'customer': customer,
         'seller': seller,
-        'user_test': user_test,
-        'groupName': group_name,
+        # 'user_test': user_test,
+        # 'groupName': group_name,
+        'usermodel': user_model_instance,
 
         'book_nook': book_nook,
         'book_list': book_list,
@@ -91,7 +117,6 @@ def Home(request):
 
     return render(request, 'knockoffKing/home.html', context=context)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Login View ~~~~~~~~~~
@@ -122,7 +147,6 @@ def login_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 # ~~~~~~~~~~ Logout View ~~~~~~~~~~
 def logout_view(request):
 
@@ -134,58 +158,59 @@ def logout_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
 def register_view(request):
     error = "None"
     if request.method == 'POST':
         error = "None"
-        
+
         # Get the form attributes
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         user_type = request.POST.get('usrTypeSelect')
-        
+
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
             # Redirect to register page if email already exists
             error = "Email already in use."
             return render(request, 'knockoffKing/register.html', {'error': error})
-            
+
         # ~~~ Django User
-        user = User(first_name=first_name, last_name=last_name, email=email, username=email) # Create user object
-        user.set_password(password) # Set user object password
-        user.save() # Save user object
+        user = User(first_name=first_name, last_name=last_name,
+                    email=email, username=email)  # Create user object
+        user.set_password(password)  # Set user object password
+        user.save()  # Save user object
 
         # ~~~ User Model
-        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name) # Create user model instance
-        usermodel.setPass(password) # Set user model instance password
-        usermodel.save() # Save user model instance
+        # Create user model instance
+        usermodel = UserModel(user=user, email=email,
+                              firstName=first_name, lastName=last_name)
+        usermodel.setPass(password)  # Set user model instance password
+        usermodel.save()  # Save user model instance
 
         # Check user type (Customer or Seller)
         if user_type == 'Customer':
-            customer = Customer(user=usermodel) # Create user model instance 
-            customer.save() # Save user model instance as customer
-            group = Group.objects.get(name='Customer') # Get Customer group
+            customer = Customer(user=usermodel)  # Create user model instance
+            customer.save()  # Save user model instance as customer
+            group = Group.objects.get(name='Customer')  # Get Customer group
             group.user_set.add(user)  # Add buyer to Customer group
-            group.save() # Save group
+            group.save()  # Save group
 
         elif user_type == 'Seller':
-            seller = Seller(user=usermodel) # Create user model instance
-            seller.save() # Save user model instance as seller
-            group = Group.objects.get(name='Seller') # Get seller group
+            seller = Seller(user=usermodel)  # Create user model instance
+            seller.save()  # Save user model instance as seller
+            group = Group.objects.get(name='Seller')  # Get seller group
             group.user_set.add(user)  # Add seller to Seller group
-            group.save() # Save group
+            group.save()  # Save group
 
         # Redirect to home page if success
         return redirect('home')
-    
+
     # Redirect to register page if invalid form
     return render(request, 'knockoffKing/register.html', {'error': error})
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Profile View ~~~~~~~~~~
@@ -198,7 +223,6 @@ def profile_view(request):
     return render(request, 'knockoffKing/profile.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~ Seller Detail View ~~~~~
@@ -241,13 +265,13 @@ def seller_detail_view(request, nameSlug):
         'seller': seller,
         # 'current_user': user_instance,
         'user': user_instance,  # Pass the 'User' object to the context
-        'usermodel': user_model_instance,  # You can still pass the 'UserModel' object if needed
+        # You can still pass the 'UserModel' object if needed
+        'usermodel': user_model_instance,
     }
     # Redirect to Seller Detail Page
     return render(request, 'knockoffKing/seller_detail.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
@@ -256,7 +280,8 @@ def products_view(request):
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            seller_model_instance = Seller.objects.get(user=user_model_instance)
+            seller_model_instance = Seller.objects.get(
+                user=user_model_instance)
             seller = seller_model_instance
         except Customer.DoesNotExist:
             pass
@@ -265,7 +290,7 @@ def products_view(request):
 
         product_test = Product.objects.filter(seller=seller_model_instance)[:1]
         product_test = product_test[0]
-        
+
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'seller': seller,
@@ -274,7 +299,6 @@ def products_view(request):
     return render(request, 'knockoffKing/products.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~ Seller Detail View ~~~~~
@@ -286,12 +310,11 @@ class ProductDetailView(generic.DetailView):
 
         # ~~~~~ Return Generated Values ~~~~~
         context = {
-        'product': product,
+            'product': product,
         }
         return render(request, 'knockoffKing/product_detail.html', context=context)
         # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
@@ -304,23 +327,22 @@ def update_product_view(request, product_id):
 
         # Fetch product by ID
         product = Product.objects.get(pk=product_id)
-    
+
     # Update product instance values
     product.name = newName
     product.price = newPrice
     product.quantity = newQuantity
-    product.save() # Save updated product instance
+    product.save()  # Save updated product instance
 
     # Return to update product page
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
 def add_product_view(request):
     error = "None"
-    success = False    
+    success = False
     if request.method == 'POST':
         # Check if User is logged in
         if request.user.is_authenticated:
@@ -352,7 +374,7 @@ def add_product_view(request):
 
         # Save the image file
         image_path = default_storage.save('products/' + image.name, image)
-        
+
         # Create the new Product
         product = Product()
         product.name = name
@@ -371,7 +393,7 @@ def add_product_view(request):
         }
         return render(request, 'knockoffKing/add_product.html', context=context)
         # ~~~~~
-        
+
     # ~~~~~ (GET) Return Generated Values ~~~~~
     context = {
         'success': success,
@@ -381,7 +403,6 @@ def add_product_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 # ~~~~~~~~~~ Delete Product ~~~~~~~~~~
 def delete_product_view(request, product_id):
     product = Product.objects.get(pk=product_id)
@@ -389,7 +410,6 @@ def delete_product_view(request, product_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Cart View ~~~~~~~~~~
@@ -403,7 +423,7 @@ def cart_view(request):
 
         cart_instance = ShoppingCart.objects.get(user=user_model_instance)
         cart = cart_instance.items.all()
-        
+
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'cart': cart_instance,
@@ -411,8 +431,6 @@ def cart_view(request):
     return render(request, 'knockoffKing/cart.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 
 
 @login_required
@@ -426,7 +444,8 @@ def add_to_cart(request, product_id):
             pass
 
         product = get_object_or_404(Product, id=product_id)
-        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
+        cart, created = ShoppingCart.objects.get_or_create(
+            user=user_model_instance)
 
         quantity = request.POST.get('quantity', 1)
 
@@ -434,7 +453,6 @@ def add_to_cart(request, product_id):
         context = {'cart': cart}
     return redirect('home')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 @login_required
@@ -448,12 +466,12 @@ def remove_from_cart(request, product_id):
             pass
 
         product = get_object_or_404(Product, id=product_id)
-        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
+        cart, created = ShoppingCart.objects.get_or_create(
+            user=user_model_instance)
 
         cart.remove_item(product)
     return redirect('cart')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Checkout View ~~~~~~~~~~
@@ -495,7 +513,6 @@ def checkout_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
 # ~~~~~~~~~~ Orders View ~~~~~~~~~~
 def orders_view(request):
 
@@ -506,7 +523,6 @@ def orders_view(request):
     return render(request, 'knockoffKing/orders.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 # ~~~~~~~~~~ Order History View ~~~~~~~~~~
