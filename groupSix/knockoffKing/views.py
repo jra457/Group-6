@@ -319,7 +319,8 @@ def update_product_view(request, product_id):
 
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
 def add_product_view(request):
-    error = "None"    
+    error = "None"
+    success = False    
     if request.method == 'POST':
         # Check if User is logged in
         if request.user.is_authenticated:
@@ -352,6 +353,7 @@ def add_product_view(request):
         # Save the image file
         image_path = default_storage.save('products/' + image.name, image)
         
+        # Create the new Product
         product = Product()
         product.name = name
         product.description = descrip
@@ -360,17 +362,19 @@ def add_product_view(request):
         product.image = image_path
         product.seller = seller
         product.save()
+        success = True
 
-
-    # Update product instance values
-    # product.name = newName
-    # product.price = newPrice
-    # product.quantity = newQuantity
-    # product.save() # Save updated product instance
-
-    # ~~~~~ Return Generated Values ~~~~~
+        # ~~~~~ (POST) Return Generated Values ~~~~~
+        context = {
+            'success': success,
+            'product': product,
+        }
+        return render(request, 'knockoffKing/add_product.html', context=context)
+        # ~~~~~
+        
+    # ~~~~~ (GET) Return Generated Values ~~~~~
     context = {
-
+        'success': success,
     }
     return render(request, 'knockoffKing/add_product.html', context=context)
     # ~~~~~

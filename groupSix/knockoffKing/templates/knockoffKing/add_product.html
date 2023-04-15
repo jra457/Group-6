@@ -10,7 +10,11 @@
     <h2 class="pb-2 border-bottom" style="color:#999999">Add Product Page</h2>
     <!-- Product Detail Page Title -->
 
-
+    {% if success %}
+    <div class="alert alert-success" role="alert">
+      <span><a href="{{ product.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ product.name }}</a> successfully created!</span>
+    </div>
+    {% endif %}
 
 
     <form class="row g-3 needs-validation" method="post" action="/add_product/" enctype="multipart/form-data" novalidate>
