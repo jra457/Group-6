@@ -7,6 +7,7 @@ from .models import *
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
 
 
 
@@ -312,6 +313,67 @@ def update_product_view(request, product_id):
 
     # Return to update product page
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Update Product ~~~~~~~~~~
+def add_product_view(request):
+    error = "None"    
+    if request.method == 'POST':
+        # Check if User is logged in
+        if request.user.is_authenticated:
+            user_instance = request.user
+            # Attempt to get seller
+            try:
+                user_model_instance = UserModel.objects.get(user=user_instance)
+                seller = Seller.objects.get(user=user_model_instance)
+
+            # If User is not Seller, Error out
+            except Seller.DoesNotExist:
+                error = "You must be logged in as a seller to add a product."
+                return render(request, 'knockoffKing/add_product.html', {'error': error})
+
+        # Fetch Product Name
+        name = request.POST.get('productName')
+
+        # Check if email already exists in database
+        if Product.objects.filter(name=name).exists():
+            # Redirect to register page if email already exists
+            error = "Product already exists."
+            return render(request, 'knockoffKing/add_product.html', {'error': error})
+
+        # Fetch the Product Description, Price, Quantity & Image
+        descrip = request.POST.get('productDescrip')
+        price = request.POST.get('productPrice')
+        quantity = request.POST.get('productQuantity')
+        image = request.FILES['productImage']
+
+        # Save the image file
+        image_path = default_storage.save('products/' + image.name, image)
+        
+        product = Product()
+        product.name = name
+        product.description = descrip
+        product.price = price
+        product.quantity = quantity
+        product.image = image_path
+        product.seller = seller
+        product.save()
+
+
+    # Update product instance values
+    # product.name = newName
+    # product.price = newPrice
+    # product.quantity = newQuantity
+    # product.save() # Save updated product instance
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+
+    }
+    return render(request, 'knockoffKing/add_product.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

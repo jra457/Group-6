@@ -1,0 +1,57 @@
+{% extends 'knockoffKing/index.html' %}
+
+{% block content %}
+
+<!-- Product Detail Page Start -->
+
+<div class="container px-1 py-3" id="productDetailContainer">
+  <div class="container">
+    <!-- Product Detail Page Title -->
+    <h2 class="pb-2 border-bottom" style="color:#999999">Add Product Page</h2>
+    <!-- Product Detail Page Title -->
+
+
+
+
+    <form class="row g-3 needs-validation" method="post" action="/add_product/" enctype="multipart/form-data" novalidate>
+
+      {% csrf_token %}
+
+      <div class="col-md-8">
+        <label for="productName" class="form-label">Name</label>
+        <input type="text" class="form-control" id="productName" name="productName" value="">
+      </div>
+      <div class="col-md-8">
+        <label for="productDescrip" class="form-label">Description</label>
+        <textarea class="form-control" id="productDescrip" name="productDescrip" value=""></textarea>
+      </div>
+      <div class="col-md-8">
+        <label for="productPrice" class="form-label">Price</label>
+        <div class="input-group has-validation">
+          <span class="input-group-text" id="dollarPrepend">$</span>
+          <input type="number" class="form-control" id="productPrice" name="productPrice" min="0" step="0.01"
+            aria-describedby="dollarPrepend" value="">
+        </div>
+      </div>
+      <div class="col-md-8">
+        <label for="productQuantity" class="form-label">Quantity</label>
+        <input type="number" class="form-control" id="productQuantity" name="productQuantity" value="">
+      </div>
+      <div class="col-md-8">
+        <label for="productImage" class="form-label">Image</label>
+        <input type="file" class="form-control" id="productImage" name="productImage" value="">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Add Product</button>
+      </div>
+    </form>
+
+
+
+
+  </div>
+</div>
+
+<!-- Product Detail Page End -->
+
+{% endblock %}

@@ -1,27 +1,27 @@
 {% extends "knockoffKing/index.html" %}
 
 {% block content %}
-    <h1>Order History</h1>
-    {% if order_history %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Date Created</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for history_item in order_history %}
-                    <tr>
-                        <td>{{ history_item.order.id }}</td>
-                        <td>{{ history_item.order.dateCreated }}</td>
-                        <td>{{ history_item.order.get_status_display }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>You have no order history.</p>
-    {% endif %}
+<h1>Order History</h1>
+{% if order_history %}
+<table>
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Date Created</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for history_item in order_history %}
+        <tr>
+            <td>{{ history_item.order.id }}</td>
+            <td>{{ history_item.order.dateCreated }}</td>
+            <td>{{ history_item.order.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have no order history.</p>
+{% endif %}
 {% endblock %}
