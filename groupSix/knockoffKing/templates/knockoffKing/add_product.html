@@ -2,60 +2,142 @@
 
 {% block content %}
 
-<!-- Product Detail Page Start -->
+<!-- Add Product Page Start -->
 
-<div class="container px-1 py-3" id="productDetailContainer">
+<div class="container px-1 py-3" id="addProductContainer">
   <div class="container">
     <!-- Product Detail Page Title -->
     <h2 class="pb-2 border-bottom" style="color:#999999">Add Product Page</h2>
     <!-- Product Detail Page Title -->
 
+    <!-- Successful Product Creation Message -->
     {% if success %}
     <div class="alert alert-success" role="alert">
-      <span><a href="{{ product.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ product.name }}</a> successfully created!</span>
+      <span><a href="{{ product.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ product.name }}</a>
+        successfully created!</span>
     </div>
     {% endif %}
+    <!-- Successful Product Creation Message -->
 
-
-    <form class="row g-3 needs-validation" method="post" action="/add_product/" enctype="multipart/form-data" novalidate>
+    <!-- Add Product Page ~ Form ~ (Start) -->
+    <form class="row g-3 needs-validation" method="post" action="/add_product/" enctype="multipart/form-data"
+      novalidate>
 
       {% csrf_token %}
 
+      <!-- (Input) Name -->
       <div class="col-md-8">
         <label for="productName" class="form-label">Name</label>
-        <input type="text" class="form-control" id="productName" name="productName" value="">
+        <input type="text" class="form-control" id="productName" name="productName" required>
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provided a product name.
+        </div>
       </div>
+      <!-- (Input) Name -->
+
+
+
+      <!-- (Input) Description -->
       <div class="col-md-8">
         <label for="productDescrip" class="form-label">Description</label>
-        <textarea class="form-control" id="productDescrip" name="productDescrip" value=""></textarea>
+        <textarea class="form-control" id="productDescrip" name="productDescrip" required></textarea>
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provided a product description.
+        </div>
       </div>
+      <!-- (Input) Description -->
+
+
+
+      <!-- (Input) Price -->
       <div class="col-md-8">
         <label for="productPrice" class="form-label">Price</label>
         <div class="input-group has-validation">
           <span class="input-group-text" id="dollarPrepend">$</span>
           <input type="number" class="form-control" id="productPrice" name="productPrice" min="0" step="0.01"
-            aria-describedby="dollarPrepend" value="">
+            aria-describedby="dollarPrepend" required>
+          <div class="valid-feedback">
+            Looks good!
+          </div>
+          <div class="invalid-feedback">
+            Please provided a product price.
+          </div>
         </div>
+
       </div>
+      <!-- (Input) Price -->
+
+
+
+      <!-- (Input) Quantity -->
       <div class="col-md-8">
         <label for="productQuantity" class="form-label">Quantity</label>
-        <input type="number" class="form-control" id="productQuantity" name="productQuantity" value="">
+        <input type="number" class="form-control" id="productQuantity" name="productQuantity" required>
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provided a product quantity.
+        </div>
       </div>
+      <!-- (Input) Quantity -->
+
+
+
+      <!-- (Input) Image -->
       <div class="col-md-8">
         <label for="productImage" class="form-label">Image</label>
-        <input type="file" class="form-control" id="productImage" name="productImage" value="">
+        <input type="file" class="form-control" id="productImage" name="productImage" required>
+        <div class="valid-feedback">
+          Looks good!
+        </div>
+        <div class="invalid-feedback">
+          Please provided a product image.
+        </div>
       </div>
+      <!-- (Input) Image -->
+
+
+
+      <!-- (Button) Add Product -->
       <div class="col-12">
         <button class="btn btn-primary" type="submit">Add Product</button>
       </div>
+      <!-- (Button) Add Product -->
+
     </form>
-
-
-
-
+    <!-- Add Product Page ~ Form ~ (End) -->
   </div>
 </div>
 
-<!-- Product Detail Page End -->
+<!-- Add Product Page End -->
+
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
 
 {% endblock %}
