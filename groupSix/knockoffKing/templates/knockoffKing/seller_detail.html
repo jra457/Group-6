@@ -24,6 +24,17 @@
           <p class="card-text">
             ${{ product.price }}
             <br>
+            <!-- Seller (Owner) View -->
+            {% if user.is_authenticated %}
+            {% if user|has_group:"Seller" %}
+              {% if usermodel.getUserID == product.seller.user_id %}
+                <!-- Product Quantity -->
+                ({{ product.quantity }})
+                <br>
+              {% endif %}
+            {% endif %}
+            {% endif %}
+            <!-- Seller (Owner) View -->
             {{ product.description }}
           </p>
         </div>
