@@ -1,27 +1,48 @@
 {% extends "knockoffKing/index.html" %}
 
 {% block content %}
-<h1>Order History</h1>
-{% if order_history %}
-<table>
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Date Created</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for history_item in order_history %}
-        <tr>
-            <td>{{ history_item.order.id }}</td>
-            <td>{{ history_item.order.dateCreated }}</td>
-            <td>{{ history_item.order.get_status_display }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>You have no order history.</p>
-{% endif %}
+<!-- Orders Page Start -->
+
+<div class="container px-1 py-3" id="productsContainer">
+    <div class="container">
+      <!-- Orders Page Title -->
+      <h2 class="pb-2 border-bottom" style="color:#999999">Orders</h2>
+      <!-- Orders Page Title -->
+  
+  
+      {% if active_orders %}
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Order ID</th>
+            <th scope="col">Order Total</th>
+            <th scope="col">Date Created</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in active_orders %}
+          <tr>
+            <th scope="row">1</th>
+            <td>{{ order.order.id }}</td>
+            <td>{{ order.getTotal }}</td>
+            <td>{{ order.order.dateCreated }}</td>
+            <td>{{ order.order.get_status_display }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+  
+      </table>
+      {% else %}
+  
+      <h5>You have no order history.</h5>
+  
+      {% endif %}
+  
+  
+    </div>
+  </div>
+  
+  <!-- Orders Page End -->
 {% endblock %}
