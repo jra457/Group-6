@@ -503,8 +503,11 @@ def checkout_view(request):
             order.sellers.add(seller)
 
         # Calculate the total price for the order
+        print("cart_instance.get_total_price():", cart_instance.get_total_price())
         orderTotal = cart_instance.get_total_price()
+        print("orderTotal:", orderTotal)
         order.subTotal = orderTotal
+        print("order.subTotal:", order.subTotal)
         order.save()
 
         # Clear the shopping cart
@@ -525,10 +528,30 @@ def checkout_view(request):
 @login_required
 def orders_view(request):
     if request.user.is_authenticated:
-        user_instance = request.user
-        user_model_instance = UserModel.objects.get(user=user_instance)
+        user_role = None
+        try:
+            user_instance = request.user
+            user_model_instance = UserModel.objects.get(user=user_instance)
+        
+            active_orders = ActiveOrders.objects.filter(user=user_model_instance)
+            try:
+                Seller.objects.get(user_id=user_model_instance.id)
+                print("SELLER")
+                user_role = 'Seller'
+            except Seller.DoesNotExist:
+                try:
+                    Customer.objects.get(user_id=user_model_instance.id)
+                    print("CUSTOMER")
+                    user_role = 'Customer'
+                except Customer.DoesNotExist:
+                    pass
+        except UserModel.DoesNotExist:
+            pass
 
-        active_orders = ActiveOrders.objects.filter(user=user_model_instance)
+        # Print the user role in the terminal
+        print(f"User {user_instance} is a {user_role}")
+        
+        print("active_orders:", active_orders[1].order.sellers.all())
 
         # ~~~~~ Return Generated Values ~~~~~
         context = {
@@ -539,4 +562,29 @@ def orders_view(request):
         # ~~~~~
     else:
         return redirect('login')
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ~~~~~~~~~~ Order Seller View ~~~~~~~~~~
+@login_required
+def orders_seller_view(request):
+        
+    if request.user.is_authenticated:
+        user_instance = request.user
+    try:
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        seller_model_instance = Seller.objects.get(user=user_model_instance)
+        seller = seller_model_instance
+    except Seller.DoesNotExist:
+        redirect('orders')
+
+    # seller = Seller.objects.get(pk=seller_id)
+    active_orders = Order.objects.filter(sellers=seller)
+    print("orders:", active_orders[1].subTotal)
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'active_orders': active_orders,
+        'seller': seller,
+    }
+    return render(request, 'knockoffKing/seller_orders.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
