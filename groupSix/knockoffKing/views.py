@@ -482,7 +482,7 @@ def checkout_view(request):
         user_model_instance = UserModel.objects.get(user=user_instance)
 
         cart_instance = ShoppingCart.objects.get(user=user_model_instance)
-
+        print("cart_instance:", cart_instance)
         # Create a new order
         order = Order()
         order.save()
@@ -490,9 +490,34 @@ def checkout_view(request):
         # Copy items from the cart to the order
         for cart_item in cart_instance.cartitem_set.all():
             order_item = OrderItem()
+            # print("order_item:", order_item.name)
             order_item.order = order
+            # print("order_item:", str(order_item.order))
             order_item.product = cart_item.product
+            
+            print("order_item.product:", order_item.product.quantity)
+
+            product = Product.objects.get(pk=order_item.product.id)
+            print("\n\nproduct:", product)
+            print("(1) product.quantity:", product.quantity)
+            
+            print("(1) cart_item.quantity:", cart_item.quantity)
+
+            pQ = product.quantity
+            oQ = cart_item.quantity
+            tempSum = pQ - oQ
+            print(f"product.quantity = {product.quantity} - {cart_item.quantity} = {tempSum}")
+            product.quantity = product.quantity - cart_item.quantity
+
+            print("(2) product.quantity:", product.quantity)
+
+            product.save()
+
+            print("(3) product.quantity:", product.quantity)
+            print("(2) cart_item.quantity:", cart_item.quantity)
             order_item.quantity = cart_item.quantity
+            print("order_item.quantity:", order_item.quantity)
+
             order_item.save()
 
         # Calculate the total price for the order
