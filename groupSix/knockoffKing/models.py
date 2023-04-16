@@ -247,7 +247,7 @@ class Order(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.id  
+        return str(self.id)
 # ~~~~~
 
 
@@ -277,6 +277,7 @@ class OrderItem(models.Model):
 class OrderHistory(models.Model):
     """Model representing the Order Details."""
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
@@ -288,11 +289,11 @@ class OrderHistory(models.Model):
     subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
 
     def getTotal(self):
-        return self.quantity * self.price
+        return self.subTotal
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.product.name
+        return str(self.order)
 # ~~~~~
 
 

@@ -482,7 +482,7 @@ def checkout_view(request):
         user_model_instance = UserModel.objects.get(user=user_instance)
 
         cart_instance = ShoppingCart.objects.get(user=user_model_instance)
-        print("cart_instance:", cart_instance)
+
         # Create a new order
         order = Order()
         order.save()
@@ -490,38 +490,21 @@ def checkout_view(request):
         # Copy items from the cart to the order
         for cart_item in cart_instance.cartitem_set.all():
             order_item = OrderItem()
-            # print("order_item:", order_item.name)
             order_item.order = order
-            # print("order_item:", str(order_item.order))
             order_item.product = cart_item.product
             
-            print("order_item.product:", order_item.product.quantity)
-
+            # Get product instance & update quantity available
             product = Product.objects.get(pk=order_item.product.id)
-            print("\n\nproduct:", product)
-            print("(1) product.quantity:", product.quantity)
-            
-            print("(1) cart_item.quantity:", cart_item.quantity)
-
-            pQ = product.quantity
-            oQ = cart_item.quantity
-            tempSum = pQ - oQ
-            print(f"product.quantity = {product.quantity} - {cart_item.quantity} = {tempSum}")
             product.quantity = product.quantity - cart_item.quantity
-
-            print("(2) product.quantity:", product.quantity)
-
             product.save()
 
-            print("(3) product.quantity:", product.quantity)
-            print("(2) cart_item.quantity:", cart_item.quantity)
             order_item.quantity = cart_item.quantity
-            print("order_item.quantity:", order_item.quantity)
-
             order_item.save()
 
         # Calculate the total price for the order
-        order.total_price = cart_instance.get_total_price()
+        orderTotal = cart_instance.get_total_price()
+        order.subTotal = orderTotal
+        print("\n\n 1 cart_instance.get_total_price():", cart_instance.get_total_price())
         order.save()
 
         # Clear the shopping cart
@@ -529,6 +512,8 @@ def checkout_view(request):
 
         # Add order to order history
         order_history = OrderHistory(user=user_model_instance, order=order)
+        print("\n\n 2 cart_instance.get_total_price():", cart_instance.get_total_price())
+        order_history.subTotal = orderTotal
         order_history.save()
 
         context = {'order': order}
@@ -539,27 +524,19 @@ def checkout_view(request):
 
 
 # ~~~~~~~~~~ Orders View ~~~~~~~~~~
-def orders_view(request):
-
-    # ~~~~~ Return Generated Values ~~~~~
-    context = {
-
-    }
-    return render(request, 'knockoffKing/orders.html', context=context)
-    # ~~~~~
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-# ~~~~~~~~~~ Order History View ~~~~~~~~~~
 @login_required
-def order_history_view(request):
+def orders_view(request):
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
-        order_history = OrderHistory.objects.filter(user=user_model_instance)
-        print("test")
-        context = {'order_history': order_history}
+        active_orders = OrderHistory.objects.filter(user=user_model_instance)
+
+        # ~~~~~ Return Generated Values ~~~~~
+        context = {
+            'active_orders': active_orders
+        }
         return render(request, 'knockoffKing/orders.html', context=context)
+        # ~~~~~
     else:
         return redirect('login')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

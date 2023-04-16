@@ -42,8 +42,7 @@ urlpatterns = [
 
     # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
-    path('orders/', views.order_history_view, name='orders'),
-    path('order_history/', views.order_history_view, name='order_history_view'),
-
+    path('orders/', views.orders_view, name='orders'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # ~~~~~
