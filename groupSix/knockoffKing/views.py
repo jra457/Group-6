@@ -280,8 +280,7 @@ def products_view(request):
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            seller_model_instance = Seller.objects.get(
-                user=user_model_instance)
+            seller_model_instance = Seller.objects.get(user=user_model_instance)
             seller = seller_model_instance
         except Customer.DoesNotExist:
             pass
@@ -418,8 +417,9 @@ def cart_view(request):
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-        except Customer.DoesNotExist:
+        except UserModel.DoesNotExist:  # Update this line
             pass
+
 
         cart_instance = ShoppingCart.objects.get(user=user_model_instance)
         cart = cart_instance.items.all()
@@ -432,7 +432,6 @@ def cart_view(request):
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 @login_required
 # ~~~~~~~~~~ Add to Cart View ~~~~~~~~~~
 def add_to_cart(request, product_id):
@@ -440,12 +439,11 @@ def add_to_cart(request, product_id):
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-        except Customer.DoesNotExist:
+        except UserModel.DoesNotExist:  # Update this line
             pass
 
         product = get_object_or_404(Product, id=product_id)
-        cart, created = ShoppingCart.objects.get_or_create(
-            user=user_model_instance)
+        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
 
         quantity = request.POST.get('quantity', 1)
 
@@ -459,22 +457,15 @@ def add_to_cart(request, product_id):
 # ~~~~~~~~~~ Remove from Cart View ~~~~~~~~~~
 def remove_from_cart(request, product_id):
     if request.user.is_authenticated:
-        user_instance = request.user
-        try:
-            user_model_instance = UserModel.objects.get(user=user_instance)
-        except Customer.DoesNotExist:
-            pass
-
+        customer = request.user.customer
         product = get_object_or_404(Product, id=product_id)
-        cart, created = ShoppingCart.objects.get_or_create(
-            user=user_model_instance)
+        cart, created = ShoppingCart.objects.get_or_create(customer=customer)
 
         cart.remove_item(product)
     return redirect('cart')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-# ~~~~~~~~~~ Checkout View ~~~~~~~~~~
+# ~~~~~~~~~~ Check Out Cart View ~~~~~~~~~~
 @login_required
 def checkout_view(request):
     if request.user.is_authenticated:
@@ -487,12 +478,15 @@ def checkout_view(request):
         order = Order()
         order.save()
 
+        # Set to keep track of unique sellers in the order
+        sellers_in_order = set()
+
         # Copy items from the cart to the order
         for cart_item in cart_instance.cartitem_set.all():
             order_item = OrderItem()
             order_item.order = order
             order_item.product = cart_item.product
-            
+
             # Get product instance & update quantity available
             product = Product.objects.get(pk=order_item.product.id)
             product.quantity = product.quantity - cart_item.quantity
@@ -501,20 +495,25 @@ def checkout_view(request):
             order_item.quantity = cart_item.quantity
             order_item.save()
 
+            # Add the product's seller to the set
+            sellers_in_order.add(product.seller)
+
+        # Assign the unique sellers to the order
+        for seller in sellers_in_order:
+            order.sellers.add(seller)
+
         # Calculate the total price for the order
         orderTotal = cart_instance.get_total_price()
         order.subTotal = orderTotal
-        print("\n\n 1 cart_instance.get_total_price():", cart_instance.get_total_price())
         order.save()
 
         # Clear the shopping cart
         cart_instance.items.clear()
 
-        # Add order to order history
-        order_history = OrderHistory(user=user_model_instance, order=order)
-        print("\n\n 2 cart_instance.get_total_price():", cart_instance.get_total_price())
-        order_history.subTotal = orderTotal
-        order_history.save()
+        # Add order to active orders
+        active_order = ActiveOrders(user=user_model_instance, order=order)
+        active_order.subTotal = orderTotal
+        active_order.save()
 
         context = {'order': order}
         return render(request, 'knockoffKing/checkout.html', context=context)
@@ -522,18 +521,19 @@ def checkout_view(request):
         return redirect('login')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 # ~~~~~~~~~~ Orders View ~~~~~~~~~~
 @login_required
 def orders_view(request):
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
-        active_orders = OrderHistory.objects.filter(user=user_model_instance)
+
+        active_orders = ActiveOrders.objects.filter(user=user_model_instance)
 
         # ~~~~~ Return Generated Values ~~~~~
         context = {
-            'active_orders': active_orders
+            'active_orders': active_orders,
+            'customer': user_model_instance,
         }
         return render(request, 'knockoffKing/orders.html', context=context)
         # ~~~~~
