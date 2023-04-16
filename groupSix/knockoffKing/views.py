@@ -178,15 +178,13 @@ def register_view(request):
             return render(request, 'knockoffKing/register.html', {'error': error})
 
         # ~~~ Django User
-        user = User(first_name=first_name, last_name=last_name,
-                    email=email, username=email)  # Create user object
+        user = User(first_name=first_name, last_name=last_name, email=email, username=email)  # Create user object
         user.set_password(password)  # Set user object password
         user.save()  # Save user object
 
         # ~~~ User Model
         # Create user model instance
-        usermodel = UserModel(user=user, email=email,
-                              firstName=first_name, lastName=last_name)
+        usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
         usermodel.setPass(password)  # Set user model instance password
         usermodel.save()  # Save user model instance
 
@@ -214,10 +212,37 @@ def register_view(request):
 
 
 # ~~~~~~~~~~ Profile View ~~~~~~~~~~
+@login_required
 def profile_view(request):
+    success = False
+    if request.user.is_authenticated:
+        user_instance = request.user
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        
+        if request.method == 'POST':
+            # Fetch new First Name/Last Name/Email
+            newEmail = request.POST.get('newEmail')
+            newFirstName = request.POST.get('newFirstName')
+            newLastName = request.POST.get('newLastName')
+
+            if newEmail:
+                user_instance.username = newEmail
+                user_instance.email = newEmail
+                user_model_instance.email = newEmail
+            if newFirstName:
+                user_instance.first_name = newFirstName
+                user_model_instance.firstName = newFirstName
+            if newLastName:
+                user_instance.last_name = newLastName
+                user_model_instance.lastName = newLastName
+
+            user_instance.save()
+            user_model_instance.save()
+            success = True
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
+        'success': success,
 
     }
     return render(request, 'knockoffKing/profile.html', context=context)
