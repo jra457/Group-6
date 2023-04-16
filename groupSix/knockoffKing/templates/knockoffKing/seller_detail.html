@@ -21,7 +21,11 @@
           <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
             style="max-width: 150px; height: auto;">
           <h5 class="card-title">{{ product.name }}</h5>
-          <p class="card-text">{{ product.description }}</p>
+          <p class="card-text">
+            ${{ product.price }}
+            <br>
+            {{ product.description }}
+          </p>
         </div>
 
         <div class="text-center">
