@@ -26,4 +26,5 @@ jobs:
         python -m pip install --upgrade pip
     - name: Run Tests
       run: |
+        cd groupSix
         python manage.py test
