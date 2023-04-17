@@ -24,6 +24,9 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install django
+        python -m pip install Pillow
     - name: Run Tests
       run: |
+        cd groupSix
         python manage.py test
