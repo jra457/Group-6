@@ -86,3 +86,41 @@ class SellerTestCase(TestCase):
 
 
 #class AdminTest(TestCase):
+
+class CustomerTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user_model_instance = UserModel.objects.create(user=self.user, email='test@example.com', firstName='Test', lastName='User')
+
+    def test_customer_instance_creation(self):
+        customer = Customer.objects.create(user=self.user_model_instance)
+        self.assertIsInstance(customer, Customer)
+
+    def test_customer_str_representation(self):
+        customer = Customer.objects.create(user=self.user_model_instance)
+        self.assertEqual(str(customer), self.user_model_instance.email)
+
+    def test_customer_user_model_relationship(self):
+        customer = Customer.objects.create(user=self.user_model_instance)
+        self.assertEqual(customer.user, self.user_model_instance)
+
+    def test_customer_deletion_on_user_model_deletion(self):
+        customer = Customer.objects.create(user=self.user_model_instance)
+        self.user_model_instance.delete()
+        with self.assertRaises(Customer.DoesNotExist):
+            Customer.objects.get(user=self.user_model_instance)
+        
+    def test_customer_queryset_ordering(self):
+        user1 = User.objects.create_user(username='testuser1', password='testpassword')
+        user_model_instance1 = UserModel.objects.create(user=user1, email='test1@example.com', firstName='Alice', lastName='Smith')
+
+        user2 = User.objects.create_user(username='testuser2', password='testpassword')
+        user_model_instance2 = UserModel.objects.create(user=user2, email='test2@example.com', firstName='Bob', lastName='Johnson')
+
+        customer1 = Customer.objects.create(user=user_model_instance1)
+        customer2 = Customer.objects.create(user=user_model_instance2)
+
+        customers = Customer.objects.all()
+
+        self.assertEqual(customers[0], customer1)
+        self.assertEqual(customers[1], customer2)
