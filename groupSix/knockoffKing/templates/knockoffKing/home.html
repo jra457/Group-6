@@ -59,11 +59,49 @@
           <div class="card-body">
             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
             <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text">
+              ${{ product.price }}
+              <br>
+              <!-- Seller (Owner) View -->
+              {% if user.is_authenticated %}
+              {% if user|has_group:"Seller" %}
+                {% if usermodel.getUserID == product.seller.user_id %}
+                  <!-- Product Quantity -->
+                  ({{ product.quantity }})
+                  <br>
+                {% endif %}
+              {% endif %}
+              {% endif %}
+              <!-- Seller (Owner) View -->
+              {{ product.description }}
+            </p>
           </div>
+          
 
           <div class="text-center">
-            <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+            {% if user.is_authenticated %}
+
+            <!-- Customer View -->
+            {% if user|has_group:"Customer" %}
+              <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+            {% endif %}
+            <!-- Customer View -->
+
+            <!-- Seller (Owner) View -->
+            {% if user|has_group:"Seller" %}
+              {% if usermodel.getUserID == product.seller.user_id %}
+                <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
+                <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
+              {% endif %}
+            {% endif %}
+            <!-- Seller (Owner) View -->
+
+            <!-- Guest View -->
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-primary btn-block">Add to Cart</a>
+            <!-- Guest View -->
+
+          {% endif %}
           </div>
 
         </div>
@@ -85,7 +123,23 @@
           </div>
 
           <div class="text-center">
-            <button class="btn btn-primary" type="submit">Add to Cart</button>
+            {% if user.is_authenticated %}
+
+              {% if user|has_group:"Customer" %}
+                <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+              {% endif %}
+
+              {% if user|has_group:"Seller" %}
+                {% if usermodel.getUserID == product.seller.user_id %}
+                  <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
+                  <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
+                {% endif %}
+              {% endif %}
+
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-primary btn-block">Add to Cart</a>
+
+            {% endif %}
           </div>
 
         </div>

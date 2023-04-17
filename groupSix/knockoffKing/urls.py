@@ -32,6 +32,7 @@ urlpatterns = [
     path('products/', views.products_view, name='products'),
     path('product/<uuid:pk>', views.ProductDetailView.as_view(), name='product-detail'),
     path('update_product/<product_id>', views.update_product_view, name='update-product'),
+    path('add_product/', views.add_product_view, name='add-product'),
     path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
     
     # ~ Cart
@@ -41,8 +42,8 @@ urlpatterns = [
 
     # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
-    path('orders/', views.order_history_view, name='orders'),
-    path('order_history/', views.order_history_view, name='order_history_view'),
-
+    path('orders/', views.orders_view, name='orders'),
+    path('seller_orders/', views.orders_seller_view, name='seller-orders'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # ~~~~~

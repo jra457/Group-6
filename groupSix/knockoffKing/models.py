@@ -215,6 +215,8 @@ class Order(models.Model):
     """Model representing the Order."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
+    sellers = models.ManyToManyField(Seller)
+
     items = models.ManyToManyField(Product, through='OrderItem')
 
     dateCreated = models.DateTimeField(auto_now_add=True)
@@ -222,6 +224,8 @@ class Order(models.Model):
     dateShipped = models.DateField(null=True, blank=True)
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the Customer.')
+
+    shippingID = models.ForeignKey(ShippingInfo, on_delete=models.CASCADE, null=True, help_text='Select the Shipping Info.')
 
     # ~~~~~ Shipping Status
     orderPlaced, packaging     , shipped, = '01', '02', '03'
@@ -243,11 +247,14 @@ class Order(models.Model):
     )
     # ~~~~~
 
-    shippingID = models.ForeignKey(ShippingInfo, on_delete=models.CASCADE, null=True, help_text='Select the Shipping Info.')
+    subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+    def getTotal(self):
+        return self.subTotal
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.id  
+        return str(self.id)
 # ~~~~~
 
 
@@ -260,9 +267,9 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     quantity = models.PositiveIntegerField(default=1)
-    
-    dateAdded = models.DateTimeField(auto_now_add=True)
 
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    
     def total_price(self):
         return self.product.price * self.quantity
     
@@ -273,26 +280,30 @@ class OrderItem(models.Model):
 
 
 
+# ~~~~~ ActiveOrders Model ~~~~~
+class ActiveOrders(models.Model):
+    """Model representing the Active Orders."""
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return str(self.order)
+# ~~~~~
+
+
+
 # ~~~~~ Order History Model ~~~~~
 class OrderHistory(models.Model):
     """Model representing the Order Details."""
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, help_text='Select the Product.')
-
-    quantity = models.IntegerField(default=1)
-
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-
-    subTotal = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-
-    def getTotal(self):
-        return self.quantity * self.price
 
     def __str__(self):
         """String for representing the Model object."""
-        return self.product.name
+        return str(self.order)
 # ~~~~~
 
 

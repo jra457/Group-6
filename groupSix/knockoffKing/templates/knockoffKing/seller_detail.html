@@ -7,41 +7,69 @@
 <!-- Seller Detail Page Start -->
 
 <div class="container px-1 py-3" id="sellerDetailContainer">
-    
-    <!-- Seller Detail Page Title -->
-    <h2 class="pb-2 border-bottom" style="color:#999999">1{{ seller.user.id }}</h2>
-    <h2 class="pb-2 border-bottom" style="color:#999999">2{{ user_instance }}</h2>
-    <h2 class="pb-2 border-bottom" style="color:#999999">3{{ user.action_time }}</h2>
-    <h2 class="pb-2 border-bottom" style="color:#999999">4{{ user.password }}</h2>
-    <h2 class="pb-2 border-bottom" style="color:#999999">5{{ usermodel.getUserID }}</h2>
-    <!-- Seller Detail Page Title -->
 
-    <!-- Seller Product Grid -->
-    <div class="row row-cols-4 g-4">
-        {% for product in seller.product_set.all %}
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text">{{ product.description }}</p>
-                    </div>
+  <!-- Seller Detail Page Title -->
+  <h2 class="pb-2 border-bottom" style="color:#999999">Seller Page ({{ seller.name }})</h2>
+  <!-- Seller Detail Page Title -->
 
-                    <div class="text-center">
-                        <button class="btn btn-primary" type="submit">Add to Cart</button>
-                        {% if usermodel != "NoneType" %}
-                        {% if usermodel.getUserID == seller.user.id %}
-                        <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
-                        <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
-                        {% endif %}
-                        {% endif %}
-                    </div>
+  <!-- Seller Product Grid -->
+  <div class="row row-cols-4 g-4">
+    {% for product in seller.product_set.all %}
+    <div class="col">
+      <div class="card h-100">
+        <div class="card-body">
+          <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+            style="max-width: 150px; height: auto;">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">
+            ${{ product.price }}
+            <br>
+            <!-- Seller (Owner) View -->
+            {% if user.is_authenticated %}
+            {% if user|has_group:"Seller" %}
+              {% if usermodel.getUserID == product.seller.user_id %}
+                <!-- Product Quantity -->
+                ({{ product.quantity }})
+                <br>
+              {% endif %}
+            {% endif %}
+            {% endif %}
+            <!-- Seller (Owner) View -->
+            {{ product.description }}
+          </p>
+        </div>
 
-                </div>
-            </div>
-        {% endfor %}
+        <div class="text-center">
+          {% if user.is_authenticated %}
+
+            <!-- Customer View -->
+            {% if user|has_group:"Customer" %}
+              <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+            {% endif %}
+            <!-- Customer View -->
+
+            <!-- Seller (Owner) View -->
+            {% if user|has_group:"Seller" %}
+              {% if usermodel.getUserID == product.seller.user_id %}
+                <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
+                <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
+              {% endif %}
+            {% endif %}
+            <!-- Seller (Owner) View -->
+
+            <!-- Guest View -->
+            {% else %}
+              <a href="{% url 'login' %}" class="btn btn-primary btn-block">Add to Cart</a>
+            <!-- Guest View -->
+
+          {% endif %}
+        </div>
+
+      </div>
     </div>
-    <!-- Seller Product Grid -->
+    {% endfor %}
+  </div>
+  <!-- Seller Product Grid -->
 
 
 </div>

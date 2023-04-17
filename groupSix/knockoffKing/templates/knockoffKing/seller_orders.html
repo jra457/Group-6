@@ -3,10 +3,10 @@
 {% block content %}
 <!-- Seller Orders Page Start -->
 
-<div class="container px-1 py-3" id="ordersContainer">
+<div class="container px-1 py-3" id="sellerOrdersContainer">
   <div class="container">
     <!-- Orders Page Title -->
-    <h2 class="pb-2 border-bottom" style="color:#999999">Customer Orders</h2>
+    <h2 class="pb-2 border-bottom" style="color:#999999">Seller Orders</h2>
     <!-- Orders Page Title -->
 
     {% if active_orders %}
@@ -24,10 +24,10 @@
         {% for order in active_orders %}
         <tr>
           <th scope="row">1</th>
-          <td>{{ order.order.id }}</td>
-          <td>${{ order.order.subTotal }}</td>
-          <td>{{ order.order.dateCreated }}</td>
-          <td>{{ order.order.get_status_display }}</td>
+          <td>{{ order.id }}</td>
+          <td>${{ order.subTotal }}</td>
+          <td>{{ order.dateCreated }}</td>
+          <td>{{ order.get_status_display }}</td>
         </tr>
         {% endfor %}
       </tbody>
