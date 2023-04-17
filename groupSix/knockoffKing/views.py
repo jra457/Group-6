@@ -186,7 +186,7 @@ def register_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
+@login_required
 # ~~~~~~~~~~ Profile View ~~~~~~~~~~
 def profile_view(request):
 
