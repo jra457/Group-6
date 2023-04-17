@@ -482,11 +482,17 @@ def add_to_cart(request, product_id):
 # ~~~~~~~~~~ Remove from Cart View ~~~~~~~~~~
 def remove_from_cart(request, product_id):
     if request.user.is_authenticated:
-        customer = request.user.customer
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+        except UserModel.DoesNotExist:  # Update this line
+            pass
+
         product = get_object_or_404(Product, id=product_id)
-        cart, created = ShoppingCart.objects.get_or_create(customer=customer)
+        cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
 
         cart.remove_item(product)
+        context = {'cart': cart}
     return redirect('cart')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
