@@ -119,6 +119,7 @@ def Home(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~~~~~~ Login View ~~~~~~~~~~
 def login_view(request):
     # Check for [HTTP] POST method
@@ -147,6 +148,7 @@ def login_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~~~~~~ Logout View ~~~~~~~~~~
 def logout_view(request):
 
@@ -156,6 +158,7 @@ def logout_view(request):
     # Redirect to home page after logout
     return redirect('home')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
@@ -178,7 +181,7 @@ def register_view(request):
             return render(request, 'knockoffKing/register.html', {'error': error})
 
         # ~~~ Django User
-        user = User(first_name=first_name, last_name=last_name, email=email, username=email)  # Create user object
+        user = User(username=email, email=email, first_name=first_name, last_name=last_name)  # Create user object
         user.set_password(password)  # Set user object password
         user.save()  # Save user object
 
@@ -211,6 +214,7 @@ def register_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~~~~~~ Profile View ~~~~~~~~~~
 @login_required
 def profile_view(request):
@@ -218,6 +222,11 @@ def profile_view(request):
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
+
+        if user_instance.groups.filter(name='Seller').exists():
+            seller = Seller.objects.get(user=user_model_instance)
+        else:
+            seller = None
         
         if request.method == 'POST':
             # Fetch new First Name/Last Name/Email
@@ -242,12 +251,14 @@ def profile_view(request):
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
+        'user': user_instance,
         'success': success,
-
+        'seller': seller,
     }
     return render(request, 'knockoffKing/profile.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # ~~~~~ Seller Detail View ~~~~~
@@ -299,6 +310,7 @@ def seller_detail_view(request, nameSlug):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
 def products_view(request):
     if request.user.is_authenticated:
@@ -325,6 +337,7 @@ def products_view(request):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~ Seller Detail View ~~~~~
 class ProductDetailView(generic.DetailView):
     model = Product
@@ -332,13 +345,23 @@ class ProductDetailView(generic.DetailView):
     def product_detail_view(request, primary_key):
         product = get_object_or_404(Product, pk=primary_key)
 
+        if request.user.is_authenticated:
+            user_instance = request.user
+            try:
+                user_model_instance = UserModel.objects.get(user=user_instance)
+                seller = Seller.objects.get(user=user_model_instance)
+            except Seller.DoesNotExist:
+                pass
+
         # ~~~~~ Return Generated Values ~~~~~
         context = {
             'product': product,
+            'seller': seller,
         }
         return render(request, 'knockoffKing/product_detail.html', context=context)
         # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
@@ -363,23 +386,26 @@ def update_product_view(request, product_id):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
 def add_product_view(request):
     error = "None"
     success = False
-    if request.method == 'POST':
-        # Check if User is logged in
-        if request.user.is_authenticated:
-            user_instance = request.user
-            # Attempt to get seller
-            try:
-                user_model_instance = UserModel.objects.get(user=user_instance)
-                seller = Seller.objects.get(user=user_model_instance)
 
-            # If User is not Seller, Error out
-            except Seller.DoesNotExist:
-                error = "You must be logged in as a seller to add a product."
-                return render(request, 'knockoffKing/add_product.html', {'error': error})
+    # Check if User is logged in
+    if request.user.is_authenticated:
+        user_instance = request.user
+        # Attempt to get seller
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            seller = Seller.objects.get(user=user_model_instance)
+
+        # If User is not Seller, Error out
+        except Seller.DoesNotExist:
+            error = "You must be logged in as a seller to add a product."
+            return render(request, 'knockoffKing/add_product.html', {'error': error})
+        
+    if request.method == 'POST':
 
         # Fetch Product Name
         name = request.POST.get('productName')
@@ -412,6 +438,7 @@ def add_product_view(request):
 
         # ~~~~~ (POST) Return Generated Values ~~~~~
         context = {
+            'seller': seller,
             'success': success,
             'product': product,
         }
@@ -420,11 +447,13 @@ def add_product_view(request):
 
     # ~~~~~ (GET) Return Generated Values ~~~~~
     context = {
+        'seller': seller,
         'success': success,
     }
     return render(request, 'knockoffKing/add_product.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # ~~~~~~~~~~ Delete Product ~~~~~~~~~~
@@ -434,6 +463,7 @@ def delete_product_view(request, product_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 # ~~~~~~~~~~ Cart View ~~~~~~~~~~
@@ -457,6 +487,8 @@ def cart_view(request):
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
 @login_required
 # ~~~~~~~~~~ Add to Cart View ~~~~~~~~~~
 def add_to_cart(request, product_id):
@@ -478,6 +510,7 @@ def add_to_cart(request, product_id):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+
 @login_required
 # ~~~~~~~~~~ Remove from Cart View ~~~~~~~~~~
 def remove_from_cart(request, product_id):
@@ -495,6 +528,8 @@ def remove_from_cart(request, product_id):
         context = {'cart': cart}
     return redirect('cart')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 # ~~~~~~~~~~ Check Out Cart View ~~~~~~~~~~
 @login_required
@@ -555,6 +590,8 @@ def checkout_view(request):
         return redirect('login')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
 # ~~~~~~~~~~ Orders View ~~~~~~~~~~
 @login_required
 def orders_view(request):
@@ -582,7 +619,7 @@ def orders_view(request):
         # Print the user role in the terminal
         print(f"User {user_instance} is a {user_role}")
         
-        print("active_orders:", active_orders[1].order.sellers.all())
+
 
         # ~~~~~ Return Generated Values ~~~~~
         context = {
@@ -594,6 +631,37 @@ def orders_view(request):
     else:
         return redirect('login')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~ Seller Detail View ~~~~~
+class OrderDetailView(generic.DetailView):
+    model = Order
+
+    def order_detail_view(request, primary_key):
+        order = get_object_or_404(Order, pk=primary_key)
+
+        order_items = order.orderitem_set.all()
+
+        if request.user.is_authenticated:
+            user_instance = request.user
+            try:
+                user_model_instance = UserModel.objects.get(user=user_instance)
+                seller = Seller.objects.get(user=user_model_instance)
+            except Seller.DoesNotExist:
+                pass
+
+        # ~~~~~ Return Generated Values ~~~~~
+        context = {
+            'order': order,
+            'seller': seller,
+            'order_items': order_items,
+        }
+        return render(request, 'knockoffKing/product_detail.html', context=context)
+        # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 # ~~~~~~~~~~ Order Seller View ~~~~~~~~~~
 @login_required
