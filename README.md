@@ -12,7 +12,7 @@
 
 * [x] [Sprint 1](https://mstate-my.sharepoint.com/:x:/g/personal/jra457_msstate_edu/ESj__tEq_WRHgdD3A9DGu5YBy1LMnp8jZ-iEHOdzUzMzyw?e=FcZdWn)
 * [x] [Sprint 2](https://mstate-my.sharepoint.com/:x:/g/personal/jra457_msstate_edu/EY5UNXrT7clBuDyzqRp3QVcBvtt4yqB7Sdxeap0nxmh3Fg?e=KlloTS)
-* [ ] [Sprint 3](https://mstate-my.sharepoint.com/:x:/g/personal/jra457_msstate_edu/EYJKiE8R3pZEqthpBomZuAYBtTdjAmYXzcpdfbu243RXFw?e=jeJa20)
+* [x] [Sprint 3](https://mstate-my.sharepoint.com/:x:/g/personal/jra457_msstate_edu/EYJKiE8R3pZEqthpBomZuAYBtTdjAmYXzcpdfbu243RXFw?e=jeJa20)
 
 ## Description
 
