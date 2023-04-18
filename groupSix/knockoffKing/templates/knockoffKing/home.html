@@ -119,7 +119,22 @@
           <div class="card-body">
             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-width: 150px; height: auto;">
             <h5 class="card-title">{{ product.name }}</h5>
-            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text">
+              ${{ product.price }}
+              <br>
+              <!-- Seller (Owner) View -->
+              {% if user.is_authenticated %}
+              {% if user|has_group:"Seller" %}
+                {% if usermodel.getUserID == product.seller.user_id %}
+                  <!-- Product Quantity -->
+                  ({{ product.quantity }})
+                  <br>
+                {% endif %}
+              {% endif %}
+              {% endif %}
+              <!-- Seller (Owner) View -->
+              {{ product.description }}
+            </p>
           </div>
 
           <div class="text-center">
