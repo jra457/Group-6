@@ -687,3 +687,38 @@ def orders_seller_view(request):
     return render(request, 'knockoffKing/seller_orders.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Search View ~~~~~~~~~~
+def search_view(request):
+    seller = None
+    user_model_instance = None
+    if request.user.is_authenticated:
+        print("USER IS AUTHENTICATED")
+        user_instance = request.user
+        user_model_instance = UserModel.objects.get(user=user_instance)
+
+        if user_instance.groups.filter(name='Seller').exists():
+            print("USER IS A SELLER")
+            seller = Seller.objects.get(user=user_model_instance)
+        else:
+            print("USER IS NOT A SELLER")
+            seller = None
+
+    query = request.GET.get('q')
+
+    products = Product.objects.filter(name__icontains=query)
+
+    print("products:", products)
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'seller': seller,
+        'usermodel': user_model_instance,
+        'query': query,
+        'products': products
+    }
+    return render(request, 'knockoffKing/search.html', context=context)
+    # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
