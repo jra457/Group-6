@@ -75,12 +75,16 @@
     <div class="container d-flex flex-wrap justify-content-center">
 
       <!-- Navbar Search ~ Form ~ (Start) -->
-      <form class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto" role="search">
+      <form class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto d-flex align-items-center" role="search" action="{% url 'search' %}" method="GET">
 
         <!-- (Input) Search query -->
-        <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+        <input class="form-control me-2" name=q type="search" placeholder="Search" aria-label="Search" id="searchBar">
         <!-- (Input) Search query -->
-
+      
+        <!-- (Button) Submit -->
+        <button class="btn btn-secondary" type="submit" id="searchBtn">Search</button>
+        <!-- (Button) Submit -->
+      
       </form>
       <!-- Navbar Search ~ Form ~ (End) -->
 
