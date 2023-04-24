@@ -476,7 +476,7 @@ def cart_view(request):
             pass
 
 
-        cart_instance = ShoppingCart.objects.get(user=user_model_instance)
+        cart_instance, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
         cart = cart_instance.items.all()
 
     # ~~~~~ Return Generated Values ~~~~~
