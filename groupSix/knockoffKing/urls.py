@@ -43,7 +43,7 @@ urlpatterns = [
     # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
     path('orders/', views.orders_view, name='orders'),
-    path('order/<uuid:pk>', views.OrderDetailView.as_view(), name='order-detail'),
+    path('order/<uuid:pk>', views.order_detail_view, name='order-detail'),
     path('seller_orders/', views.orders_seller_view, name='seller-orders'),
 
     # ~ Search
