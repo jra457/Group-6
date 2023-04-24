@@ -468,19 +468,30 @@ def delete_product_view(request, product_id):
 
 # ~~~~~~~~~~ Cart View ~~~~~~~~~~
 def cart_view(request):
+    errors = []
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-        except UserModel.DoesNotExist:  # Update this line
+        except UserModel.DoesNotExist:
             pass
 
 
         cart_instance, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
         cart = cart_instance.items.all()
+        
+        # Check quantity of products in cart
+        for product in cart:
+            if product.quantity <= 0:
+                # Create error message
+                errors.append(f"The product '{product.name}' is currently out of stock and was removed your from cart.")
+                # Remove item from cart
+                cart_instance.remove_item(product)
+            
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
+        'errors': errors,
         'cart': cart_instance,
     }
     return render(request, 'knockoffKing/cart.html', context=context)
