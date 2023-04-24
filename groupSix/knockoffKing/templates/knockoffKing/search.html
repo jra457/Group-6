@@ -41,7 +41,11 @@
     
               <!-- Customer View -->
               {% if user|has_group:"Customer" %}
-                <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+                {% if product.quantity <= 0 %}
+                  <button class="btn btn-primary btn-block" disabled>Out of Stock</button>
+                {% else %}
+                  <a href="{% url 'add-to-cart' product_id=product.id %}" class="btn btn-primary btn-block">Add to Cart</a>
+                {% endif %}
               {% endif %}
               <!-- Customer View -->
     
