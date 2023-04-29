@@ -116,13 +116,21 @@ class Seller(models.Model):
 
     nameSlug = models.SlugField(unique=True, null=True, blank=True)
 
-    income = models.BigIntegerField(default=0)
+    income = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
     def get_absolute_url(self):
         nameSlug = slugify(self.name)
 
         """Returns the url to access a particular location instance."""
         return reverse('seller-detail', args=[nameSlug])
+    
+    def deposit(self, earnings):
+        self.income = self.income + earnings
+        self.save()
+
+    def withdraw(self):
+        self.income = 0
+        self.save()
     
     def save(self, *args, **kwargs):
         """Override the save method to set the slug_name field."""
