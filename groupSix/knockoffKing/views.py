@@ -476,6 +476,7 @@ def cart_view(request):
         except UserModel.DoesNotExist:
             pass
 
+    
 
         cart_instance, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
         cart = cart_instance.items.all()
@@ -557,7 +558,6 @@ def checkout_view(request):
 
         # Set to keep track of unique sellers in the order
         sellers_in_order = set()
-
         # Copy items from the cart to the order
         for cart_item in cart_instance.cartitem_set.all():
             order_item = OrderItem()
@@ -570,6 +570,12 @@ def checkout_view(request):
             product.save()
 
             order_item.quantity = cart_item.quantity
+
+            # Get seller instance & update seller's income
+            seller_object = Seller.objects.get(name=product.seller.name)
+            earnings = (product.price * order_item.quantity)
+            seller_object.deposit(earnings)            
+            
             order_item.save()
 
             # Add the product's seller to the set
