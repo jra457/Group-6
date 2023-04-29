@@ -116,6 +116,8 @@ class Seller(models.Model):
 
     nameSlug = models.SlugField(unique=True, null=True, blank=True)
 
+    income = models.BigIntegerField(default=0)
+
     def get_absolute_url(self):
         nameSlug = slugify(self.name)
 
