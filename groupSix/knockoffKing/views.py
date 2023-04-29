@@ -645,31 +645,32 @@ def orders_view(request):
 
 
 
-# ~~~~~ Seller Detail View ~~~~~
-class OrderDetailView(generic.DetailView):
-    model = Order
+# ~~~~~ Order Detail View ~~~~~
+def order_detail_view(request, pk):
+    seller = None
+    
+    order_history = get_object_or_404(Order, id=pk)
+    order_items = order_history.orderitem_set.all()
 
-    def order_detail_view(request, primary_key):
-        order = get_object_or_404(Order, pk=primary_key)
+    for item in order_items:
+        print(item.product.name, item.quantity, item.price)
 
-        order_items = order.orderitem_set.all()
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            seller = Seller.objects.get(user=user_model_instance)
+        except Seller.DoesNotExist:
+            pass
 
-        if request.user.is_authenticated:
-            user_instance = request.user
-            try:
-                user_model_instance = UserModel.objects.get(user=user_instance)
-                seller = Seller.objects.get(user=user_model_instance)
-            except Seller.DoesNotExist:
-                pass
-
-        # ~~~~~ Return Generated Values ~~~~~
-        context = {
-            'order': order,
-            'seller': seller,
-            'order_items': order_items,
-        }
-        return render(request, 'knockoffKing/product_detail.html', context=context)
-        # ~~~~~
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'order': order_history,
+        'seller': seller,
+        'order_items': order_items,
+    }
+    return render(request, 'knockoffKing/order_detail.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
