@@ -684,7 +684,6 @@ def order_detail_view(request, pk):
 # ~~~~~~~~~~ Order Seller View ~~~~~~~~~~
 @login_required
 def orders_seller_view(request):
-        
     if request.user.is_authenticated:
         user_instance = request.user
     try:
@@ -703,6 +702,74 @@ def orders_seller_view(request):
         'seller': seller,
     }
     return render(request, 'knockoffKing/seller_orders.html', context=context)
+    # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Deposit View ~~~~~~~~~~
+def deposit_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+    try:
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        seller_model_instance = Seller.objects.get(user=user_model_instance)
+        seller = seller_model_instance
+    except Seller.DoesNotExist:
+        redirect('orders')
+
+    Transactions.objects.create(seller=seller, amount=seller.income, category='Deposit')
+
+    seller.deposit()
+    
+    # Redirect to seller orders
+    return redirect('seller-orders')
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Withdraw View ~~~~~~~~~~
+def withdraw_view(request):
+    if request.user.is_authenticated:
+        user_instance = request.user
+    try:
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        seller_model_instance = Seller.objects.get(user=user_model_instance)
+        seller = seller_model_instance
+    except Seller.DoesNotExist:
+        redirect('orders')
+
+    Transactions.objects.create(seller=seller, amount=seller.income, category='Withdraw')
+
+    seller.withdraw()
+    
+    # Redirect to seller orders
+    return redirect('seller-orders')
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Withdraw History View ~~~~~~~~~~
+@login_required
+def transactions_view(request):
+        
+    if request.user.is_authenticated:
+        user_instance = request.user
+    try:
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        seller_model_instance = Seller.objects.get(user=user_model_instance)
+        seller = seller_model_instance
+    except Seller.DoesNotExist:
+        redirect('orders')
+
+    transactions = Transactions.objects.filter(seller=seller)
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'transactions': transactions,
+        'seller': seller,
+    }
+    return render(request, 'knockoffKing/transactions.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

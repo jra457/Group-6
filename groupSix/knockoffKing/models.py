@@ -118,18 +118,21 @@ class Seller(models.Model):
 
     income = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
+    prevWithdraw = models.DateTimeField(null=True, blank=True)
+
     def get_absolute_url(self):
         nameSlug = slugify(self.name)
 
         """Returns the url to access a particular location instance."""
         return reverse('seller-detail', args=[nameSlug])
     
-    def deposit(self, earnings):
-        self.income = self.income + earnings
+    def deposit(self):
+        self.income = 0
         self.save()
 
     def withdraw(self):
         self.income = 0
+        self.prevWithdraw = timezone.now()
         self.save()
     
     def save(self, *args, **kwargs):
@@ -147,6 +150,25 @@ class Seller(models.Model):
     
     class Meta:
         ordering = ['name', 'user__email']
+# ~~~~~
+
+
+
+# ~~~~~ Shipping Info Model ~~~~~
+class Transactions(models.Model):
+    """Model representing the transaction history for a Seller."""
+    categories = (
+        ('Deposit', 'Deposit'),
+        ('Withdraw', 'Withdraw'),
+    )
+
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+
+    date = models.DateTimeField(auto_now_add=True)
+
+    amount = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    
+    category = models.CharField(max_length=10, choices=categories, default='Deposit')
 # ~~~~~
 
 

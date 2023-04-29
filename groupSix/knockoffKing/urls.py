@@ -46,6 +46,11 @@ urlpatterns = [
     path('order/<uuid:pk>', views.order_detail_view, name='order-detail'),
     path('seller_orders/', views.orders_seller_view, name='seller-orders'),
 
+    # ~ Transactions
+    path('transactions/', views.transactions_view, name='transactions'),
+    path('deposit/', views.deposit_view, name='deposit'),
+    path('withdraw/', views.withdraw_view, name='withdraw'),
+
     # ~ Search
     path('search/', views.search_view, name='search'),
     
