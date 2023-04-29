@@ -1,42 +1,44 @@
 {% extends "knockoffKing/index.html" %}
 
 {% block content %}
-<!-- Seller Orders Page Start -->
+<!-- Transactions Page Start -->
 
-<div class="container-fluid"  id="sellerOrdersContainer">
+<div class="container-fluid"  id="transactionsContainer">
   <div class="row">
     <div class="col-md-8">
       <div class="container px-1 py-3">
         <div class="container">
           <!-- Orders Page Title -->
-          <h2 class="pb-2 border-bottom" style="color:#999999">Seller Orders</h2>
+          <h2 class="pb-2 border-bottom" style="color:#999999">Transaction History for {{ seller.name }}</h2>
           <!-- Orders Page Title -->
 
-          {% if active_orders %}
+          {% if transactions %}
           <table class="table table-hover">
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Order ID</th>
-                <th scope="col">Order Total</th>
-                <th scope="col">Date Created</th>
-                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Category</th>
               </tr>
             </thead>
             <tbody>
-              {% for order in active_orders %}
+              {% for transaction in transactions %}
               <tr>
                 <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ order.id }}</td>
-                <td>${{ order.subTotal }}</td>
-                <td>{{ order.dateCreated }}</td>
-                <td>{{ order.get_status_display }}</td>
+                <td>{{ transaction.date }}</td>
+                {% if transaction.category == 'Deposit' %}
+                  <td style="color:red;">${{ transaction.amount }}</td>  
+                {% else %}  
+                  <td>${{ transaction.amount }}</td>
+                {% endif %}
+                <td>{{ transaction.category }}</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
           {% else %}
-          <h5>You have no order history.</h5>
+          <h5>You have no transaction history.</h5>
           {% endif %}
         </div>
       </div>
@@ -46,7 +48,7 @@
         <div class="container">
           <h2 class="pb-2 border-bottom" style="color:#999999">Current Earnings</h2>
           {% if seller %}
-          <h3>${{ seller.income }}</h3>
+            <h3>${{ seller.income }}</h3>
             {% if seller.income > 0 %}
               <a class="btn btn-secondary" href="{% url 'withdraw' %}" role="button">Withdraw</a>
             {% elif seller.income < 0 %}
@@ -54,13 +56,11 @@
             {% else %}
               <a class="btn btn-secondary disabled" role="button">Withdraw</a>
             {% endif %}
-          <a class="btn btn-secondary" href="{% url 'transactions' %}" role="button">History</a>
           {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Seller Orders Page End -->
+<!-- Transactions Page End -->
 {% endblock %}
