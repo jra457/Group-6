@@ -587,6 +587,7 @@ def checkout_view(request):
             product.save()
 
             order_item.quantity = cart_item.quantity
+            order_item.price = product.price
 
             # Get seller instance & update seller's income
             seller_object = Seller.objects.get(name=product.seller.name)
