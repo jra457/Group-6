@@ -181,8 +181,15 @@ def register_view(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        password = request.POST.get('password')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
         user_type = request.POST.get('usrTypeSelect')
+
+        # Check if passwords match
+        if password1 != password2:
+            # Redirect to register page if passwords do not match
+            error = "Password do not match."
+            return render(request, 'knockoffKing/register.html', {'error': error})            
 
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
@@ -192,13 +199,13 @@ def register_view(request):
 
         # ~~~ Django User
         user = User(username=email, email=email, first_name=first_name, last_name=last_name)  # Create user object
-        user.set_password(password)  # Set user object password
+        user.set_password(password1)  # Set user object password
         user.save()  # Save user object
 
         # ~~~ User Model
         # Create user model instance
         usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
-        usermodel.setPass(password)  # Set user model instance password
+        usermodel.setPass(password1)  # Set user model instance password
         usermodel.save()  # Save user model instance
 
         # Check user type (Customer or Seller)
