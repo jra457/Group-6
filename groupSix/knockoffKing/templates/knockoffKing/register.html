@@ -17,14 +17,14 @@
         {% endif %}
 
         <!-- Register Page ~ Form ~ (Start) -->
-        <form class="row g-3 needs-validation" method="post" action="/register/" novalidate>
+        <form class="row g-3 needs-validation" method="post" action="/register/" autocomplete="off" novalidate>
 
             {% csrf_token %}
 
             <!-- (Input) First Name -->
             <div class="col-md-4 position-relative">
                 <label for="first_name" class="form-label">First name</label>
-                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ first_name|default:'' }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
@@ -39,7 +39,7 @@
             <!-- (Input) Last Name -->
             <div class="col-md-4 position-relative">
                 <label for="last_name" class="form-label">Last name</label>
-                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ last_name|default:'' }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
@@ -54,7 +54,7 @@
             <!-- (Input) Email -->
             <div class="col-md-4 position-relative">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" name="email" required>
+                <input type="email" class="form-control" id="email" name="email" value="{{ email|default:'' }}" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
@@ -69,7 +69,7 @@
             <!-- (Input) Password1 -->
             <div class="col-md-4 position-relative">
                 <label for="password1" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password1" name="password1" required>
+                <input type="password" class="form-control" id="password1" name="password1" autocomplete="new-password" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
@@ -84,7 +84,7 @@
             <!-- (Input) Password2 -->
             <div class="col-md-4 position-relative">
                 <label for="password2" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="password2" name="password2" required>
+                <input type="password" class="form-control" id="password2" name="password2" autocomplete="new-password" required>
                 <div class="valid-feedback">
                     Looks good!
                 </div>
@@ -107,8 +107,9 @@
                 <label for="usrTypeSelect" class="form-label">Select User Type</label>
                 <select class="form-select" id="usrTypeSelect" name="usrTypeSelect" required
                     aria-describedby="validationMessage" required>
-                    <option value="Customer">Customer</option>
-                    <option value="Seller">Seller</option>
+                    <option value="">Select User Type</option>
+                    <option value="Customer"{% if user_type == "Customer" %} selected{% endif %}>Customer</option>
+                    <option value="Seller"{% if user_type == "Seller" %} selected{% endif %}>Seller</option>
                 </select>
                 <div class="invalid-feedback" id="validationMessage">Please select a user type</div>
             </div>
