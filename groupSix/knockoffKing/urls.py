@@ -45,6 +45,8 @@ urlpatterns = [
     path('orders/', views.orders_view, name='orders'),
     path('order/<uuid:pk>', views.order_detail_view, name='order-detail'),
     path('seller_orders/', views.orders_seller_view, name='seller-orders'),
+    path('return/<uuid:oID>/<uuid:pID>', views.return_view, name='return'),
+    path('return_process/<uuid:oID>/<uuid:pID>', views.return_process_view, name='return-process'),
 
     # ~ Transactions
     path('transactions/', views.transactions_view, name='transactions'),
