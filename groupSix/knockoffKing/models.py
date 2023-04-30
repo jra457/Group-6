@@ -425,7 +425,7 @@ class CartItem(models.Model):
     dateAdded = models.DateTimeField(auto_now_add=True)
 
     def total_price(self):
-        return self.product.price * self.quantity
+        return (self.quantity * self.product.price)
     
     def __str__(self):
         """String for representing the Model object."""

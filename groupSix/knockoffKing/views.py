@@ -678,6 +678,7 @@ def checkout_view(request):
             order.sellers.add(seller)
 
         # Calculate the total price for the order
+        print("cart_instance.quantity:", cart_instance.quantity)
         print("cart_instance.get_total_price():", cart_instance.get_total_price())
         orderTotal = cart_instance.get_total_price()
         print("orderTotal:", orderTotal)

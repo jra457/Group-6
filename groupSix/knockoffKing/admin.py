@@ -27,6 +27,13 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('seller',)
 
 
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ['product', 'quantity', 'total_price']
+
+    def total_price(self, obj):
+        return obj.total_price()
+    total_price.admin_order_field = 'total_price'
+
 admin.site.register(UserModel)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Admin)
@@ -37,6 +44,6 @@ admin.site.register(OrderHistory)
 admin.site.register(ShippingInfo)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(ShoppingCart)
-admin.site.register(CartItem)
+admin.site.register(CartItem, CartItemAdmin)
 admin.site.register(OrderItem)
 admin.site.register(Transactions)

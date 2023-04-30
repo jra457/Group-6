@@ -74,7 +74,8 @@ class SellerTestCase(TestCase):
         order = Order.objects.create(customer=customer)
 
         product = Product.objects.create(name='Test Product', description='Test Description', price=10.0, quantity=10, seller=self.seller)
-        order_item = OrderItem.objects.create(order=order, product=product, quantity=2)
+
+        order_item = OrderItem.objects.create(order=order, product=product, price=product.price, quantity=2)
 
         self.assertEqual(order_item.total_price(), 20.0)
 
