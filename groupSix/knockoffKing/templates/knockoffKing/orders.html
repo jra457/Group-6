@@ -23,7 +23,7 @@
       <tbody>
         {% for order in active_orders %}
         <tr>
-          <th scope="row">1</th>
+          <th scope="row">{{ forloop.counter }}</th>
           <td><a href="{{ order.order.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ order.order.id }}</a></td>
           <td>${{ order.order.subTotal }}</td>
           <td>{{ order.order.dateCreated }}</td>
