@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 
 # ~~~~~~~~~~ Home View ~~~~~~~~~~
 def Home(request):
-
+    message = "None"
     book_nook = Seller.objects.get(name='Book Nook')
     book_list = Product.objects.filter(seller=book_nook)[:4]
 
@@ -88,8 +88,13 @@ def Home(request):
 
             'sports_world': sports_world,
             'equipment_list': equipment_list,
-        }
 
+            'message': message,
+        }
+        messages_data = messages.get_messages(request)
+        message = next((m for m in messages_data if m.level == messages.SUCCESS), None)
+        if message:
+            context['message'] = message.message
         return render(request, 'knockoffKing/home.html', context=context)
 
     print("TEST7")
@@ -113,8 +118,13 @@ def Home(request):
 
         'sports_world': sports_world,
         'equipment_list': equipment_list,
-    }
 
+        'message': message,
+    }
+    messages_data = messages.get_messages(request)
+    message = next((m for m in messages_data if m.level == messages.SUCCESS), None)
+    if message:
+        context['message'] = message.message
     return render(request, 'knockoffKing/home.html', context=context)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -504,6 +514,7 @@ def cart_view(request):
 @login_required
 # ~~~~~~~~~~ Add to Cart View ~~~~~~~~~~
 def add_to_cart(request, product_id):
+    message = "None"
     if request.user.is_authenticated:
         user_instance = request.user
         try:
@@ -513,11 +524,17 @@ def add_to_cart(request, product_id):
 
         product = get_object_or_404(Product, id=product_id)
         cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
-
+        
         quantity = request.POST.get('quantity', 1)
 
+        message = f"({quantity}) {product.name} was added to your cart."
+        messages.success(request, message)
+
         cart.add_item(product, quantity)
-        context = {'cart': cart}
+        context = {
+            'message': message,
+            'cart': cart,
+        }
     return redirect('home')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -574,7 +591,7 @@ def checkout_view(request):
             # Get seller instance & update seller's income
             seller_object = Seller.objects.get(name=product.seller.name)
             earnings = (product.price * order_item.quantity)
-            seller_object.deposit(earnings)            
+            seller_object.checkout(earnings)            
             
             order_item.save()
 
@@ -659,7 +676,7 @@ def order_detail_view(request, pk):
     order_items = order_history.orderitem_set.all()
 
     for item in order_items:
-        print(item.product.name, item.quantity, item.price)
+        print(item.product.name, item.quantity, item.price, item.get_absolute_url())
 
     if request.user.is_authenticated:
         user_instance = request.user
@@ -668,6 +685,9 @@ def order_detail_view(request, pk):
             seller = Seller.objects.get(user=user_model_instance)
         except Seller.DoesNotExist:
             pass
+
+    for item in order_items:
+        print("item.return_available()", item.return_available())
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
@@ -703,6 +723,69 @@ def orders_seller_view(request):
     }
     return render(request, 'knockoffKing/seller_orders.html', context=context)
     # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Return View ~~~~~~~~~~
+@login_required
+def return_view(request, oID, pID):
+    error = "None"
+    if request.user.is_authenticated:
+        user_instance = request.user
+    try:
+        user_model_instance = UserModel.objects.get(user=user_instance)
+        user = User.objects.get(usermodel=user_model_instance)
+    except User.DoesNotExist:
+        redirect('orders')
+
+    order = get_object_or_404(Order, id=oID)
+    product = get_object_or_404(Product, id=pID)
+
+    item = get_object_or_404(OrderItem, order=order, product=product)
+
+    if not item.return_available():
+        error = f"Error: {product.name} in order ({order.id}) has already been returned."
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'error': error,
+        'oID': oID,
+        'pID': pID,
+        'order': order,
+        'item': item,
+        'product': product,
+    }
+    return render(request, 'knockoffKing/return.html', context=context)
+    # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Return View ~~~~~~~~~~
+@login_required
+def return_process_view(request, oID, pID):
+    if request.method == 'POST':
+        # Fetch return quantity
+        quantity = request.POST.get('quantity')
+    quantity = int(quantity)
+    order = get_object_or_404(Order, id=oID)
+    product = get_object_or_404(Product, id=pID)
+    seller = get_object_or_404(Seller, user=product.seller.user)
+    item = get_object_or_404(OrderItem, order=order, product=product)
+
+    value = quantity * item.price
+    seller.refund(value)
+
+    item.returnQuantity += quantity
+    item.save()
+    product.quantity += quantity
+    product.save()
+
+    if (item.return_available()):
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
+    else:
+        return redirect('order-detail', pk=oID)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
