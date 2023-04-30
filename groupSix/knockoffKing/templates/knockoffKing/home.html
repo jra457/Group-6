@@ -47,6 +47,12 @@
 
     <h3>Shop for the latest products</h3>
 
+    {% if message != "None" %}
+    <div class="alert alert-info" role="alert">
+      {{ message }}
+    </div>
+    {% endif %}
+
   </div>
 
   <br>

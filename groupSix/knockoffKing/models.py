@@ -116,11 +116,32 @@ class Seller(models.Model):
 
     nameSlug = models.SlugField(unique=True, null=True, blank=True)
 
+    income = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+
+    prevWithdraw = models.DateTimeField(null=True, blank=True)
+
     def get_absolute_url(self):
         nameSlug = slugify(self.name)
 
         """Returns the url to access a particular location instance."""
         return reverse('seller-detail', args=[nameSlug])
+    
+    def checkout(self, val):
+        self.income += val
+        self.save()
+
+    def refund(self, val):
+        self.income -= val
+        self.save()
+   
+    def deposit(self):
+        self.income = 0
+        self.save()
+
+    def withdraw(self):
+        self.income = 0
+        self.prevWithdraw = timezone.now()
+        self.save()
     
     def save(self, *args, **kwargs):
         """Override the save method to set the slug_name field."""
@@ -137,6 +158,25 @@ class Seller(models.Model):
     
     class Meta:
         ordering = ['name', 'user__email']
+# ~~~~~
+
+
+
+# ~~~~~ Shipping Info Model ~~~~~
+class Transactions(models.Model):
+    """Model representing the transaction history for a Seller."""
+    categories = (
+        ('Deposit', 'Deposit'),
+        ('Withdraw', 'Withdraw'),
+    )
+
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+
+    date = models.DateTimeField(auto_now_add=True)
+
+    amount = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    
+    category = models.CharField(max_length=10, choices=categories, default='Deposit')
 # ~~~~~
 
 
@@ -270,12 +310,24 @@ class OrderItem(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=0)
+
+    returnQuantity = models.PositiveIntegerField(default=0)
 
     price = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular order item instance."""
+        return reverse('return', args=[str(self.order.id), str(self.product.id)])
     
+    def return_available(self):
+        if (self.returnQuantity >= self.quantity):
+            return False
+        else:
+            return True
+
     def total_price(self):
-        return self.product.price * self.quantity
+        return self.price * self.quantity
     
     def __str__(self):
         """String for representing the Model object."""

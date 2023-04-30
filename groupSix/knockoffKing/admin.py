@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import UserModel, Product, Admin, Customer, Seller, \
+from .models import UserModel, Product, Admin, Customer, Seller, Transactions, \
     OrderHistory, ShippingInfo, Order, ShoppingCart, CartItem, OrderItem, ActiveOrders
 
 admin.site.register(UserModel)
@@ -16,3 +16,4 @@ admin.site.register(Order)
 admin.site.register(ShoppingCart)
 admin.site.register(CartItem)
 admin.site.register(OrderItem)
+admin.site.register(Transactions)

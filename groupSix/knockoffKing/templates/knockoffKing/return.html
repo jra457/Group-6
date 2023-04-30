@@ -1,0 +1,88 @@
+{% extends 'knockoffKing/index.html' %}
+
+{% block content %}
+
+<style>
+    .img-max img {
+        max-width: 100%;
+        max-height: 400px;
+    }
+</style>
+
+<!-- Product Detail Page Start -->
+
+<div class="container px-1 py-3" id="productDetailContainer">
+    <div class="container">
+        <!-- Product Detail Page Title -->
+        <h2 class="pb-2 border-bottom" style="color:#999999">Return Page for {{ product.name }}</h2>
+        <!-- Product Detail Page Title -->
+        
+        {% if error != "None" %}
+        <div class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+        {% endif %}
+
+        <h5>Order ID: {{ order.id }}</h5>
+
+        <div class="row mt-4">
+            <!-- Product Details Column -->
+            <div class="col-md-6">
+                <h5>{{ product.name }}</h5>
+                <p><strong>Price:</strong> ${{ item.price }}</p>
+                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                <p><strong>Description:</strong> {{ product.description }}</p>
+                <p><strong>Image:</strong></p>
+                <div class="img-max">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+                </div>
+            </div>
+            <!-- End of Product Details Column -->
+
+            <!-- Order Form Column -->
+            <div class="col-md-6">
+              {% if item.return_available %}
+                <form class="row g-3 needs-validation" method="POST" action="{% url 'return-process' oID pID %}">
+
+                    {% csrf_token %}
+
+                    <div class="col-md-8">
+                        <label for="quantity" class="form-label">Quantity Ordered:</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity"
+                            value="{{ item.quantity }}" min="1" max="{{ item.quantity }}">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-secondary" type="submit">Return</button>
+                    </div>
+                </form>
+                {% else %}
+                  <form class="row g-3 needs-validation">
+                    <div class="col-md-8">
+                        <label for="quantity" class="form-label">Quantity Ordered:</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity"
+                            value="{{ item.quantity }}" disabled>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-secondary" disabled>Return</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <!-- End of Order Form Column -->
+        </div>
+
+    </div>
+</div>
+
+<!-- Product Detail Page End -->
+
+<script>
+    // Update product details on form input change
+    document.querySelector('#quantity').addEventListener('input', function () {
+        document.querySelector('#quantity').textContent = this.value;
+        console.log('Product quantity updated to: ' + this.value);
+    });
+</script>
+
+
+{% endblock %}
