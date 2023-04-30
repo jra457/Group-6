@@ -12,10 +12,13 @@
 
 		<!-- Successful Product Creation Message -->
 		{% if success %}
-		<div class="alert alert-success" role="alert">
-			<!-- <span><a href="{{ product.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ product.name }}</a> -->
+			<div class="alert alert-success" role="alert">
 				Your profile was successfully updated!</span>
-		</div>
+			</div>
+		{% elif error %}
+			<div class="alert alert-danger" role="alert">
+				Passwords did not match.</span>
+			</div>
 		{% endif %}
 		<!-- Successful Product Creation Message -->
 
@@ -51,6 +54,24 @@
 
 
 
+			<!-- (Input) Password1 -->
+			<div class="col-md-8">
+				<label for="newPass1" class="form-label">Password</label>
+				<input type="password" class="form-control" id="newPass1" name="newPass1">     
+		</div>
+		<!-- (Input) Password1 -->
+
+
+
+		<!-- (Input) Password2 -->
+		<div class="col-md-8">
+				<label for="newPass2" class="form-label">Confirm Password</label>
+				<input type="password" class="form-control" id="newPass2" name="newPass2">
+		</div>
+		<!-- (Input) Password2 -->
+
+
+
 			<!-- (Button) Update Profile -->
 			<div class="col-12">
 				<button class="btn btn-primary" type="submit">Update Profile</button>
@@ -66,15 +87,18 @@
 	// Update profile details on form input change
 	document.querySelector('#newEmail').addEventListener('input', function () {
 			document.querySelector('#newEmail').textContent = this.value;
-			console.log('Profile email updated to: ' + this.value);
 	});
 	document.querySelector('#newFirstName').addEventListener('input', function () {
 			document.querySelector('#newFirstName').textContent = this.value;
-			console.log('Profile first name updated to: ' + this.value);
 	});
 	document.querySelector('#newLastName').addEventListener('input', function () {
 			document.querySelector('#newLastName').textContent = this.value;
-			console.log('Profile last name updated to: ' + this.value);
+	});
+	document.querySelector('#newPass1').addEventListener('input', function () {
+			document.querySelector('#newPass1').textContent = this.value;
+	});
+	document.querySelector('#newPass2').addEventListener('input', function () {
+			document.querySelector('#newPass2').textContent = this.value;
 	});
 </script>
 

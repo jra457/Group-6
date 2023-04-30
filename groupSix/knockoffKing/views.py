@@ -236,6 +236,7 @@ def register_view(request):
 @login_required
 def profile_view(request):
     success = False
+    error = False
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
@@ -250,6 +251,8 @@ def profile_view(request):
             newEmail = request.POST.get('newEmail')
             newFirstName = request.POST.get('newFirstName')
             newLastName = request.POST.get('newLastName')
+            newPass1 = request.POST.get('newPass1')
+            newPass2 = request.POST.get('newPass2')
 
             if newEmail:
                 user_instance.username = newEmail
@@ -261,16 +264,24 @@ def profile_view(request):
             if newLastName:
                 user_instance.last_name = newLastName
                 user_model_instance.lastName = newLastName
-
-            user_instance.save()
-            user_model_instance.save()
-            success = True
+            if newPass2:
+                if newPass1 == newPass2:
+                    user_instance.password = newPass1
+                    user_model_instance.password = newPass1
+                else:
+                    error = True
+            
+            if not error:
+                user_instance.save()
+                user_model_instance.save()
+                success = True
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'user': user_instance,
         'success': success,
         'seller': seller,
+        'error': error,
     }
     return render(request, 'knockoffKing/profile.html', context=context)
     # ~~~~~
