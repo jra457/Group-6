@@ -1,5 +1,7 @@
 {% extends 'knockoffKing/index.html' %}
 
+{% load group_tags %} {# Load the custom filter #}
+
 {% block content %}
 
 <style>
@@ -17,50 +19,65 @@
         <h2 class="pb-2 border-bottom" style="color:#999999">Product Detail Page</h2>
         <!-- Product Detail Page Title -->
 
-        <div class="row mt-4">
-            <!-- Product Details Column -->
-            <div class="col-md-6">
-                <h5>{{ product.name }}</h5>
-                <p><strong>Price:</strong> {{ product.price }}</p>
-                <p><strong>Quantity:</strong> {{ product.quantity }}</p>
-                <p><strong>Description:</strong> {{ product.description }}</p>
-                <p><strong>Image:</strong></p>
-                <div class="img-max">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
-                </div>
-            </div>
-            <!-- End of Product Details Column -->
+        <!-- Check that User is Product owner -->
+        {% if user.is_authenticated %}
+            {% if user|has_group:"Seller" or user|has_group:"Admin" %}
+                {% if usermodel.getUserID == product.seller.user_id or user|has_group:"Admin" %}
 
-            <!-- Order Form Column -->
-            <div class="col-md-6">
-                <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}">
-
-                    {% csrf_token %}
-
-                    <div class="col-md-8">
-                        <label for="newName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="newName" name="newName" value="{{ product.name }}">
-                    </div>
-                    <div class="col-md-8">
-                        <label for="newPrice" class="form-label">Price</label>
-                        <div class="input-group has-validation">
-                            <span class="input-group-text" id="dollarPrepend">$</span>
-                            <input type="number" class="form-control" id="newPrice" name="newPrice" min="0" step="0.01"
-                                aria-describedby="dollarPrepend" value="{{ product.price }}">
+                    <div class="row mt-4">
+                        <!-- Product Details Column -->
+                        <div class="col-md-6">
+                            <h5>{{ product.name }}</h5>
+                            <p><strong>Price:</strong> {{ product.price }}</p>
+                            <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+                            <p><strong>Description:</strong> {{ product.description }}</p>
+                            <p><strong>Image:</strong></p>
+                            <div class="img-max">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+                            </div>
                         </div>
+                        <!-- End of Product Details Column -->
+
+                        <!-- Order Form Column -->
+                        <div class="col-md-6">
+                            <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}">
+
+                                {% csrf_token %}
+
+                                <div class="col-md-8">
+                                    <label for="newName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="newName" name="newName" value="{{ product.name }}">
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="newPrice" class="form-label">Price</label>
+                                    <div class="input-group has-validation">
+                                        <span class="input-group-text" id="dollarPrepend">$</span>
+                                        <input type="number" class="form-control" id="newPrice" name="newPrice" min="0" step="0.01"
+                                            aria-describedby="dollarPrepend" value="{{ product.price }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <label for="newQuantity" class="form-label">Quantity</label>
+                                    <input type="number" class="form-control" id="newQuantity" name="newQuantity"
+                                        value="{{ product.quantity }}">
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary" type="submit">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- End of Order Form Column -->
                     </div>
-                    <div class="col-md-8">
-                        <label for="newQuantity" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="newQuantity" name="newQuantity"
-                            value="{{ product.quantity }}">
+
+                {% else %}
+                    <!-- Error message for invalid Seller -->
+                    <div class="alert alert-danger" role="alert">
+                        You must be logged in as the Seller of this product!
                     </div>
-                    <div class="col-12">
-                        <button class="btn btn-primary" type="submit">Update</button>
-                    </div>
-                </form>
-            </div>
-            <!-- End of Order Form Column -->
-        </div>
+
+                {% endif %}
+            {% endif %}
+        {% endif %}
 
     </div>
 </div>
