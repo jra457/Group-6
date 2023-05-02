@@ -26,7 +26,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
 
     # ~ Stores
-    path('seller/<slug:nameSlug>', views.seller_detail_view, name='seller-detail'),
+    path('seller/<slug:nameSlug>', views.store_view, name='seller-detail'),
 
     # ~ Products
     path('products/', views.products_view, name='products'),
