@@ -20,6 +20,14 @@
 
     <!-- Seller Navbar -->
 
+{% elif user|has_group:"Admin" %}
+
+    <!-- Admin Navbar -->
+
+    {% include 'knockoffKing/nav_admin.html' %}
+
+    <!-- Admin Navbar -->
+
 {% else %}
 
     <!-- Guest Navbar -->
