@@ -15,7 +15,7 @@
 
       <h1>Welcome to Knockoff King {{ user.first_name }} {{ user.last_name }}</h1>
 
-      Email: {{ user.id }}
+      User ID: {{ user.id }}
 
     {% else %}
 
@@ -34,6 +34,12 @@
       <!-- User is a seller -->
       <div>
         <p>Group: Seller</p>
+        <!-- Add content specific to sellers here -->
+      </div>
+    {% elif user|has_group:"Admin" %}
+      <!-- User is a seller -->
+      <div>
+        <p>Group: Admin</p>
         <!-- Add content specific to sellers here -->
       </div>
     {% else %}
