@@ -1,9 +1,7 @@
 {% extends 'knockoffKing/index.html' %}
 
 {% block content %}
-
 <!-- Profile Page Start -->
-
 <div class="container px-1 py-3" id="profileContainer">
 	<div class="container">
 		<!-- Profile Page Title -->
@@ -12,69 +10,179 @@
 
 		<!-- Successful Product Creation Message -->
 		{% if success %}
-		<div class="alert alert-success" role="alert">
-			<!-- <span><a href="{{ product.get_absolute_url }}"><i class="fas fa-circle me-2"></i>{{ product.name }}</a> -->
-				Your profile was successfully updated!</span>
-		</div>
+			<div class="alert alert-success" role="alert">Your profile was successfully updated!</div>
+		{% elif error %}
+			<div class="alert alert-danger" role="alert">{{ error }}</div>
 		{% endif %}
 		<!-- Successful Product Creation Message -->
 
-		<!-- Add Product Page ~ Form ~ (Start) -->
-		<form class="row g-3 needs-validation" method="post" action="/profile/" novalidate>
+		<div class="row">
+			<!-- Profile Column Start -->
+			<div class="col-md-6">
+				<form class="row g-3 needs-validation" method="post" action="/profile/" novalidate>
 
-			{% csrf_token %}
+					{% csrf_token %}
 
-			<!-- (Input) Email -->
-			<div class="col-md-8">
-				<label for="newEmail" class="form-label">Email</label>
-				<input type="text" class="form-control" id="newEmail" name="newEmail" value="{{ user.email }}">
+					<!-- (Input) Email -->
+					<div class="col-md-12">
+						<label for="newEmail" class="form-label">Email</label>
+						<input type="text" class="form-control" id="newEmail" name="newEmail" value="{{ user.email }}">
+					</div>
+					<!-- (Input) Email -->
+
+
+
+					<!-- (Input) First Name -->
+					<div class="col-md-12">
+						<label for="newFirstName" class="form-label">First Name</label>
+						<input type="text" class="form-control" id="newFirstName" name="newFirstName" value="{{ user.first_name }}">
+					</div>
+					<!-- (Input) First Name -->
+
+
+
+					<!-- (Input) Last Name -->
+					<div class="col-md-12">
+						<label for="newLastName" class="form-label">Last Name</label>
+						<input type="text" class="form-control" id="newLastName" name="newLastName" value="{{ user.last_name }}">
+					</div>
+					<!-- (Input) Last Name -->
+
+
+
+					<!-- (Input) Password1 -->
+					<div class="col-md-12">
+						<label for="newPass1" class="form-label">Password</label>
+						<input type="password" class="form-control" id="newPass1" name="newPass1" autocomplete="new-password">
+					</div>
+					<!-- (Input) Password1 -->
+
+
+
+					<!-- (Input) Password2 -->
+					<div class="col-md-12">
+						<label for="newPass2" class="form-label">Confirm Password</label>
+						<input type="password" class="form-control" id="newPass2" name="newPass2" autocomplete="new-password">
+					</div>
+					<!-- (Input) Password2 -->
+
+
+
+					<!-- (Button) Update Profile -->
+					<div class="col-12">
+						<button class="btn btn-secondary" type="submit">Update Profile</button>
+					</div>
+					<!-- (Button) Update Profile -->
+
+				</form>
 			</div>
-			<!-- (Input) Email -->
+			<!-- Personal Column End -->
 
 
 
-			<!-- (Input) First Name -->
-			<div class="col-md-8">
-				<label for="newFirstName" class="form-label">First Name</label>
-				<input type="text" class="form-control" id="newFirstName" name="newFirstName" value="{{ user.first_name }}">
+			<!-- Shipping Info Column Start -->
+			<div class="col-md-6">
+				<form class="row g-3 needs-validation" method="post" action="/profile/" novalidate>
+
+					{% csrf_token %}
+					
+					<!-- (Input) Address1 -->
+					<div class="col-md-12">
+						<label for="newAdd1" class="form-label">Address</label>
+						<input type="text" class="form-control" id="newAdd1" name="newAdd1" value="{{ ship.address1 }}" required>
+						<div class="invalid-feedback">Please provide a valid address.</div>
+					</div>
+					<!-- (Input) Address1 -->
+
+
+
+					<!-- (Input) Address2 -->
+					<div class="col-md-12">
+						<label for="newAdd2" class="form-label">Address 2</label>
+						<input type="text" class="form-control" id="newAdd2" name="newAdd2" value="{{ ship.address2 }}">
+					</div>
+					<!-- (Input) Address2 -->
+
+
+
+					<!-- (Input) City -->
+					<div class="col-md-12">
+						<label for="newCity" class="form-label">City</label>
+						<input type="text" class="form-control" id="newCity" name="newCity" value="{{ ship.city }}" required>
+						<div class="invalid-feedback">Please provide a valid city.</div>
+					</div>
+					<!-- (Input) City -->
+
+
+
+					<!-- (Input) State -->
+					<div class="col-md-12">
+						<label for="newState" class="form-label">State</label>
+						<input type="text" class="form-control" id="newState" name="newState" value="{{ ship.state }}" required>
+						<div class="invalid-feedback">Please provide a valid state.</div>
+					</div>
+					<!-- (Input) State -->
+
+
+
+					<!-- (Input) Zip Code -->
+					<div class="col-md-12">
+						<label for="newZip" class="form-label">Zip Code</label>
+							<input type="text" class="form-control" id="newZip" name="newZip" value="{{ ship.zipCode|default:'' }}" required>
+						<div class="invalid-feedback">Please provide a valid zip code.</div>
+					</div>
+					<!-- (Input) Zip Code -->
+
+
+
+					<!-- (Button) Update Shipping Information -->
+					<div class="col-12">
+						<button class="btn btn-secondary" type="submit">Update Address</button>
+					</div>
+					<!-- (Button) Update Shipping Information -->
+
+				</form>
+
 			</div>
-			<!-- (Input) First Name -->
+			<!-- Shipping Info Column End -->
 
-
-
-			<!-- (Input) Last Name -->
-			<div class="col-md-8">
-				<label for="newLastName" class="form-label">Last Name</label>
-				<input type="text" class="form-control" id="newLastName" name="newLastName" value="{{ user.last_name }}">
-			</div>
-			<!-- (Input) Last Name -->
-
-
-
-			<!-- (Button) Update Profile -->
-			<div class="col-12">
-				<button class="btn btn-primary" type="submit">Update Profile</button>
-			</div>
-			<!-- (Button) Update Profile -->
-
+		</div>
 	</div>
 </div>
-
 <!-- Profile Page End -->
 
 <script>
 	// Update profile details on form input change
 	document.querySelector('#newEmail').addEventListener('input', function () {
 			document.querySelector('#newEmail').textContent = this.value;
-			console.log('Profile email updated to: ' + this.value);
 	});
 	document.querySelector('#newFirstName').addEventListener('input', function () {
 			document.querySelector('#newFirstName').textContent = this.value;
-			console.log('Profile first name updated to: ' + this.value);
 	});
 	document.querySelector('#newLastName').addEventListener('input', function () {
 			document.querySelector('#newLastName').textContent = this.value;
-			console.log('Profile last name updated to: ' + this.value);
+	});
+	document.querySelector('#newPass1').addEventListener('input', function () {
+			document.querySelector('#newPass1').textContent = this.value;
+	});
+	document.querySelector('#newPass2').addEventListener('input', function () {
+			document.querySelector('#newPass2').textContent = this.value;
+	});
+
+	document.querySelector('#newAdd1').addEventListener('input', function () {
+			document.querySelector('#newAdd1').textContent = this.value;
+	});
+	document.querySelector('#newAdd2').addEventListener('input', function () {
+			document.querySelector('#newAdd2').textContent = this.value;
+	});
+	document.querySelector('#newCity').addEventListener('input', function () {
+			document.querySelector('#newCity').textContent = this.value;
+	});
+	document.querySelector('#newState').addEventListener('input', function () {
+			document.querySelector('#newState').textContent = this.value;
+	});
+	document.querySelector('#newZip').addEventListener('input', function () {
+			document.querySelector('#newZip').textContent = this.value;
 	});
 </script>
 

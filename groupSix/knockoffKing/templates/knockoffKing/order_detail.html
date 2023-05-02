@@ -24,9 +24,9 @@
       <tbody>
         {% for item in order_items %}
         <tr>
-          <th scope="row">1</th>
+          <th scope="row">{{ forloop.counter }}</th>
           <td>{{ item.product.name }}</td>
-          <td>{{ item.product.price }}</td>
+          <td>${{ item.product.price }}</td>
           <td>{{ item.quantity }}</td>
           {% if item.return_available %}
             <td><a href="{{ item.get_absolute_url }}" class="btn btn-secondary btn-sm" role="button">Return</a></td>

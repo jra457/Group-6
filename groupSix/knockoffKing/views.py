@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
+import re
 
 
 # ~~~~~~~~~~ Home View ~~~~~~~~~~
@@ -181,24 +182,50 @@ def register_view(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
-        password = request.POST.get('password')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
         user_type = request.POST.get('usrTypeSelect')
+
+        # Check if passwords match
+        if password1 != password2:
+            # Redirect to register page if passwords do not match
+            error = "Password do not match."        
 
         # Check if email already exists in database
         if User.objects.filter(email=email).exists():
             # Redirect to register page if email already exists
-            error = "Email already in use."
-            return render(request, 'knockoffKing/register.html', {'error': error})
+            error = f"The email {email} is already in use."
+    
+        pattern = r'^[a-zA-Z\'\-]+$'
+        name = f"{first_name} {last_name}"
+        if not re.match(pattern, name):
+            # Redirect to register page if email already exists
+            error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
+
+        # ~~~~~ Return Field Inputs ~~~~~
+        context = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'user_type': user_type,
+            'error': error,
+        }
+        # ~~~~~
+
+        # Return to register page if error
+        if error:
+            return render(request, 'knockoffKing/register.html', context=context)
+
 
         # ~~~ Django User
         user = User(username=email, email=email, first_name=first_name, last_name=last_name)  # Create user object
-        user.set_password(password)  # Set user object password
+        user.set_password(password1)  # Set user object password
         user.save()  # Save user object
 
         # ~~~ User Model
         # Create user model instance
         usermodel = UserModel(user=user, email=email, firstName=first_name, lastName=last_name)
-        usermodel.setPass(password)  # Set user model instance password
+        usermodel.setPass(password1)  # Set user model instance password
         usermodel.save()  # Save user model instance
 
         # Check user type (Customer or Seller)
@@ -229,10 +256,12 @@ def register_view(request):
 @login_required
 def profile_view(request):
     success = False
+    error = False
+    pattern = r'^[a-zA-Z\'\-]+$'
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
-
+        shipping_info, created = ShippingInfo.objects.get_or_create(user=user_model_instance)
         if user_instance.groups.filter(name='Seller').exists():
             seller = Seller.objects.get(user=user_model_instance)
         else:
@@ -243,27 +272,72 @@ def profile_view(request):
             newEmail = request.POST.get('newEmail')
             newFirstName = request.POST.get('newFirstName')
             newLastName = request.POST.get('newLastName')
+            newPass1 = request.POST.get('newPass1')
+            newPass2 = request.POST.get('newPass2')
+
+            newAdd1 = request.POST.get('newAdd1')
+            newAdd2 = request.POST.get('newAdd2')
+            newCity = request.POST.get('newCity')
+            newState = request.POST.get('newState')
+            newZip = request.POST.get('newZip')
 
             if newEmail:
-                user_instance.username = newEmail
-                user_instance.email = newEmail
-                user_model_instance.email = newEmail
-            if newFirstName:
-                user_instance.first_name = newFirstName
-                user_model_instance.firstName = newFirstName
-            if newLastName:
-                user_instance.last_name = newLastName
-                user_model_instance.lastName = newLastName
+                # Check if email already exists in database
+                if User.objects.filter(email=newEmail).exclude(email=user_model_instance.email).exists():
+                    # Redirect to register page if email already exists
+                    error = f"The email {newEmail} is already in use."
+                else:
+                    user_instance.username = newEmail
+                    user_instance.email = newEmail
+                    user_model_instance.email = newEmail
 
-            user_instance.save()
-            user_model_instance.save()
-            success = True
+            if newFirstName:
+                if not re.match(pattern, newFirstName):
+                    # Redirect to register page if email already exists
+                    error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
+                else:
+                    user_instance.first_name = newFirstName
+                    user_model_instance.firstName = newFirstName
+
+            if newLastName:
+                if not re.match(pattern, newFirstName):
+                    # Redirect to register page if email already exists
+                    error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
+                else:
+                    user_instance.last_name = newLastName
+                    user_model_instance.lastName = newLastName
+
+            if newPass2:
+                if newPass1 == newPass2:
+                    user_instance.password = newPass1
+                    user_model_instance.password = newPass1
+                else:
+                    error = "Password do not match."
+
+            if newAdd1:
+                shipping_info.address1 = newAdd1
+            if newAdd2:
+                shipping_info.address2 = newAdd2
+            if newCity:
+                shipping_info.city = newCity
+            if newState:
+                shipping_info.state = newState
+            if newZip:
+                shipping_info.zipCode = newZip
+            
+            if not error:
+                user_instance.save()
+                user_model_instance.save()
+                shipping_info.save()
+                success = True
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'user': user_instance,
+        'ship': shipping_info,
         'success': success,
         'seller': seller,
+        'error': error,
     }
     return render(request, 'knockoffKing/profile.html', context=context)
     # ~~~~~
@@ -587,6 +661,7 @@ def checkout_view(request):
             product.save()
 
             order_item.quantity = cart_item.quantity
+            order_item.price = product.price
 
             # Get seller instance & update seller's income
             seller_object = Seller.objects.get(name=product.seller.name)
@@ -603,6 +678,7 @@ def checkout_view(request):
             order.sellers.add(seller)
 
         # Calculate the total price for the order
+        print("cart_instance.quantity:", cart_instance.quantity)
         print("cart_instance.get_total_price():", cart_instance.get_total_price())
         orderTotal = cart_instance.get_total_price()
         print("orderTotal:", orderTotal)

@@ -150,7 +150,7 @@ class Seller(models.Model):
 
     def __str__(self):
         """String for representing the Model object."""
-        return f'{self.name}, {self.user.email}'
+        return f'{self.name} ({self.user.email})'
     
     def __uuid__(self):
         return self.user.id
@@ -184,11 +184,11 @@ class Transactions(models.Model):
 # ~~~~~ Shipping Info Model ~~~~~
 class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    streetNumber = models.CharField(default='', help_text='Street Number', max_length=16)
+    address1 = models.CharField(max_length=16, default='', help_text='Address Line 1', db_column="streetNumber")
 
-    streetName = models.CharField(max_length=64, default='', help_text='Street Name')
+    address2 = models.CharField(max_length=64, default='', help_text='Address Line 2', db_column="streetName")
 
     city = models.CharField(max_length=64, default='', help_text='City')
 
@@ -234,18 +234,25 @@ class ShippingInfo(models.Model):
     state = models.CharField(
         max_length=2,
         choices=stateChoices,
-        default='AL',
+        blank=True,
+        default='',
         help_text="State",
     )
     # ~~~~~
 
-    zipCode = models.IntegerField(default='', help_text='Zip Code')
-
-    shippingCost = models.DecimalField(default=1, decimal_places=2, max_digits=10000)
+    zipCode = models.IntegerField(null=True, blank=True, help_text='Zip Code')
 
     def getAddress(self):
         """String for representing the Model object."""
-        return f"{self.streetNumber} {self.streetName}, {self.city}, {self.state}"
+        return f"{self.address1} {self.address2}, {self.city}, {self.state}"
+    
+    def __str__(self):
+        """String for representing the Model object."""
+        if self.address2:
+            returnStr = f"({self.user.email}) {self.address1}, {self.address2}, {self.city}, {self.state}, {self.zipCode}"
+        else:
+            returnStr = f"({self.user.email}) {self.address1}, {self.city}, {self.state}, {self.zipCode}"
+        return returnStr
 # ~~~~~
 
 
@@ -418,7 +425,7 @@ class CartItem(models.Model):
     dateAdded = models.DateTimeField(auto_now_add=True)
 
     def total_price(self):
-        return self.product.price * self.quantity
+        return (self.quantity * self.product.price)
     
     def __str__(self):
         """String for representing the Model object."""
