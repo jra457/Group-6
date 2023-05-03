@@ -742,10 +742,51 @@ def checkout_view(request):
         active_order.subTotal = orderTotal
         active_order.save()
 
-        context = {'order': order}
-        return render(request, 'knockoffKing/checkout.html', context=context)
+        return redirect(reverse('checkout-success', args=[order.id]))
     else:
         return redirect('login')
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Orders View ~~~~~~~~~~
+@login_required
+def checkout_success_view(request, pk):
+    # Initialize return values
+    user_model_instance = None
+    order = get_object_or_404(Order, id=pk)
+    order_products = order.items.all()
+    
+
+    # If user is logged in, get UserModel instance
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+
+            # Check if the user is a Seller
+            try:
+                Seller.objects.get(user_id=user_model_instance.id)
+
+            # If the user is not a Seller, try to find a Customer instance
+            except Seller.DoesNotExist:
+                try:
+                    Customer.objects.get(user_id=user_model_instance.id)
+
+                except Customer.DoesNotExist:
+                    pass
+
+        # Exception for Admins
+        except UserModel.DoesNotExist:
+            pass
+
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'order': order,
+        'order_products': order_products,
+    }
+    return render(request, 'knockoffKing/checkout_success.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

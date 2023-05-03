@@ -42,6 +42,7 @@ urlpatterns = [
 
     # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
+    path('checkout_success/<uuid:pk>', views.checkout_success_view, name='checkout-success'),
     path('orders/', views.orders_customer_view, name='orders'),
     path('order/<uuid:pk>', views.order_detail_view, name='order-detail'),
     path('seller_orders/', views.orders_seller_view, name='seller-orders'),
