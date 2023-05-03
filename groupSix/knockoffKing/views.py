@@ -219,6 +219,7 @@ def profile_view(request):
     error = False
     user_model_instance = None
     user_instance_exists = False
+    seller_instance_exists = False
     pattern = r'^[a-zA-Z\'\-]+$'
 
     # If user is logged in, get UserModel instance
@@ -235,6 +236,7 @@ def profile_view(request):
         # Check if the user is a Seller
         if user_instance.groups.filter(name='Seller').exists():
             seller = Seller.objects.get(user=user_model_instance)
+            seller_instance_exists = True
         else:
             seller = None
         
@@ -245,6 +247,8 @@ def profile_view(request):
             newLastName = request.POST.get('newLastName')
             newPass1 = request.POST.get('newPass1')
             newPass2 = request.POST.get('newPass2')
+            if seller_instance_exists:
+                newStoreName = request.POST.get('newStoreName')
 
             newAdd1 = request.POST.get('newAdd1')
             newAdd2 = request.POST.get('newAdd2')
@@ -295,6 +299,10 @@ def profile_view(request):
                     # Redirect to profile page if passwords do not match
                     error = "Password do not match."
 
+            # ~ Update Store Name
+            if seller_instance_exists and newStoreName:
+                seller.name = newStoreName
+
             # ~ Update Address Line 1
             if newAdd1:
                 shipping_info.address1 = newAdd1
@@ -322,6 +330,9 @@ def profile_view(request):
                 success = True
                 if user_instance_exists:
                     user_model_instance.save()
+
+    if seller_instance_exists and not seller.authenticated:
+        error = "Seller account is pending approval."
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
