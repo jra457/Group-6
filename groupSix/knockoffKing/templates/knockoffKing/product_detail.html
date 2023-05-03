@@ -5,99 +5,139 @@
 {% block content %}
 
 <style>
-    .img-max img {
-        max-width: 100%;
-        max-height: 400px;
-    }
+  .img-max img {
+    max-width: 100%;
+    max-height: 400px;
+  }
 </style>
 
 <!-- Product Detail Page Start -->
 
 <div class="container px-1 py-3" id="productDetailContainer">
-    <div class="container">
-        <!-- Product Detail Page Title -->
-        <h2 class="pb-2 border-bottom" style="color:#999999">Product Detail Page</h2>
-        <!-- Product Detail Page Title -->
+  <div class="container">
+    <!-- Product Detail Page Title -->
+    <h2 class="pb-2 border-bottom" style="color:#999999">Product Detail Page</h2>
+    <!-- Product Detail Page Title -->
 
-        <!-- Check that User is Product owner -->
-        {% if user.is_authenticated %}
-            {% if user|has_group:"Seller" or user|has_group:"Admin" %}
-                {% if usermodel.getUserID == product.seller.user_id or user|has_group:"Admin" %}
+    <!-- Check that User is Product owner -->
+    {% if user.is_authenticated %}
+    {% if user|has_group:"Seller" or user|has_group:"Admin" %}
+    {% if usermodel.getUserID == product.seller.user_id or user|has_group:"Admin" %}
 
-                    <div class="row mt-4">
-                        <!-- Product Details Column -->
-                        <div class="col-md-6">
-                            <h5>{{ product.name }}</h5>
-                            <p><strong>Price:</strong> {{ product.price }}</p>
-                            <p><strong>Quantity:</strong> {{ product.quantity }}</p>
-                            <p><strong>Description:</strong> {{ product.description }}</p>
-                            <p><strong>Image:</strong></p>
-                            <div class="img-max">
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
-                            </div>
-                        </div>
-                        <!-- End of Product Details Column -->
+    <div class="row mt-4">
+      <!-- Product Details Column Start -->
+      <div class="col-md-6">
+        <h5>{{ product.name }}</h5>
+        <p><strong>Price:</strong> {{ product.price }}</p>
+        <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+        <p><strong>Image:</strong></p>
+        <div class="img-max">
+          <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+        </div>
+      </div>
+      <!-- Product Details Column End-->
 
-                        <!-- Order Form Column -->
-                        <div class="col-md-6">
-                            <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}">
+      <!-- Product Form Column Start -->
+      <div class="col-md-6">
+        <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}">
 
-                                {% csrf_token %}
+          {% csrf_token %}
 
-                                <div class="col-md-8">
-                                    <label for="newName" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="newName" name="newName" value="{{ product.name }}">
-                                </div>
-                                <div class="col-md-8">
-                                    <label for="newPrice" class="form-label">Price</label>
-                                    <div class="input-group has-validation">
-                                        <span class="input-group-text" id="dollarPrepend">$</span>
-                                        <input type="number" class="form-control" id="newPrice" name="newPrice" min="0" step="0.01"
-                                            aria-describedby="dollarPrepend" value="{{ product.price }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <label for="newQuantity" class="form-label">Quantity</label>
-                                    <input type="number" class="form-control" id="newQuantity" name="newQuantity"
-                                        value="{{ product.quantity }}">
-                                </div>
-                                <div class="col-12">
-                                    <button class="btn btn-primary" type="submit">Update</button>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- End of Order Form Column -->
-                    </div>
+          <!-- (Input) Name -->
+          <div class="col-md-8">
+            <label for="newName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="newName" name="newName" value="{{ product.name }}">
+          </div>
+          <!-- (Input) Name -->
 
-                {% else %}
-                    <!-- Error message for invalid Seller -->
-                    <div class="alert alert-danger" role="alert">
-                        You must be logged in as the Seller of this product!
-                    </div>
 
-                {% endif %}
-            {% endif %}
-        {% endif %}
 
+          <!-- (Input) Description -->
+          <div class="col-md-8">
+            <label for="newDescrip" class="form-label">Description</label>
+            <textarea class="form-control" id="newDescrip" name="newDescrip" placeholder="{{ product.description }}"></textarea>
+          </div>
+          <!-- (Input) Description -->
+
+
+
+          <!-- (Input) Price -->          
+          <div class="col-md-8">
+            <label for="newPrice" class="form-label">Price</label>
+            <div class="input-group has-validation">
+              <span class="input-group-text" id="dollarPrepend">$</span>
+              <input type="number" class="form-control" id="newPrice" name="newPrice" min="0" step="0.01"
+                aria-describedby="dollarPrepend" value="{{ product.price }}">
+            </div>
+          </div>
+          <!-- (Input) Price -->
+
+
+
+          <!-- (Input) Quantity -->
+          <div class="col-md-8">
+            <label for="newQuantity" class="form-label">Quantity</label>
+            <input type="number" class="form-control" id="newQuantity" name="newQuantity"
+              value="{{ product.quantity }}">
+          </div>
+          <!-- (Input) Quantity -->
+
+
+
+          <!-- (Input) Image -->
+          <div class="col-md-8">
+            <label for="newImage" class="form-label">Image</label>
+            <input type="file" class="form-control" id="newImage" name="newImage">
+          </div>
+          <!-- (Input) Image -->
+
+
+
+          <!-- (Button) Update Product -->
+          <div class="col-12">
+            <button class="btn btn-primary" type="submit">Update</button>
+          </div>
+          <!-- (Button) Update Product -->
+
+        </form>
+      </div>
+      <!-- Product Form Column End -->
     </div>
+
+    {% else %}
+
+    <!-- Error message for invalid Seller -->
+    <div class="alert alert-danger" role="alert">
+      You must be logged in as the Seller of this product!
+    </div>
+
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
+  </div>
 </div>
 
 <!-- Product Detail Page End -->
 
 <script>
-    // Update product details on form input change
-    document.querySelector('#newName').addEventListener('input', function () {
-        document.querySelector('#newName').textContent = this.value;
-        console.log('Product name updated to: ' + this.value);
-    });
-    document.querySelector('#newPrice').addEventListener('input', function () {
-        document.querySelector('#newPrice').textContent = this.value;
-        console.log('Product price updated to: ' + this.value);
-    });
-    document.querySelector('#newQuantity').addEventListener('input', function () {
-        document.querySelector('#newQuantity').textContent = this.value;
-        console.log('Product quantity updated to: ' + this.value);
-    });
+  // Update product details on form input change
+  document.querySelector('#newName').addEventListener('input', function () {
+    document.querySelector('#newName').textContent = this.value;
+  });
+  document.querySelector('#newDescrip').addEventListener('input', function () {
+    document.querySelector('#newDescrip').textContent = this.value;
+  });
+  document.querySelector('#newPrice').addEventListener('input', function () {
+    document.querySelector('#newPrice').textContent = this.value;
+  });
+  document.querySelector('#newQuantity').addEventListener('input', function () {
+    document.querySelector('#newQuantity').textContent = this.value;
+  });
+  document.querySelector('#newImage').addEventListener('input', function () {
+    document.querySelector('#newImage').textContent = this.value;
+  });
 </script>
 
 
