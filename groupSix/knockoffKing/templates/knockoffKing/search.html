@@ -23,8 +23,8 @@
                 <br>
                 <!-- Seller (Owner) View -->
                 {% if user.is_authenticated %}
-                {% if user|has_group:"Seller" %}
-                  {% if usermodel.getUserID == product.seller.user_id %}
+                {% if user|has_group:"Seller" or user|has_group:"Admin" %}
+                  {% if usermodel.getUserID == product.seller.user_id or user|has_group:"Admin" %}
                     <!-- Product Quantity -->
                     ({{ product.quantity }})
                     <br>
@@ -50,8 +50,8 @@
               <!-- Customer View -->
     
               <!-- Seller (Owner) View -->
-              {% if user|has_group:"Seller" %}
-                {% if usermodel.getUserID == product.seller.user_id %}
+              {% if user|has_group:"Seller" or user|has_group:"Admin" %}
+                {% if usermodel.getUserID == product.seller.user_id or user|has_group:"Admin" %}
                   <a class="btn btn-secondary" href="{{ product.get_absolute_url }}" role="button">Update</a>
                   <a class="btn btn-danger" href="{% url 'delete-product' product.id %}" role="button">Delete</a>
                 {% endif %}
