@@ -156,10 +156,13 @@ class AdminTestCase(TestCase):
         )
         self.client.login(username='admin', password='adminpassword')
 
+        user1 = User.objects.create_user(
+            username='testuser1', password='testpassword')
+        user_model_instance1 = UserModel.objects.create(
+            user=user1, email='test1@example.com', firstName='Alice', lastName='Smith')
+
         # Create a sample seller user
-        self.seller_user = Seller.objects.create(
-            # Add any required fields for the Seller model here
-        )
+        self.seller_user = Seller.objects.create(user=user_model_instance1)
 
         # Create some sample products and a regular user
         self.product1 = Product.objects.create(
