@@ -763,7 +763,6 @@ def checkout_success_view(request, pk):
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            active_orders = ActiveOrders.objects.filter(user=user_model_instance)
 
             # Check if the user is a Seller
             try:
@@ -780,12 +779,6 @@ def checkout_success_view(request, pk):
         # Exception for Admins
         except UserModel.DoesNotExist:
             pass
-    print("order.items", order_products)
-
-    for product in order_products:
-        print("product:", product.name)
-
-
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
