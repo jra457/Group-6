@@ -11,13 +11,24 @@
       <h2>Products Page</h2>
 
       <div class="px-3 py-0 my-0" style=>
-        <a href="{% url 'add-product' %}" class="btn btn-primary" role="button">Add Product</a>
+        {% if error != "None" %}
+          <a class="d-none btn btn-primary" role="button">Add Product</a>
+        {% elif seller.authenticated %}
+          <a href="{% url 'add-product' %}" class="btn btn-primary" role="button">Add Product</a>
+        {% else %}
+          <a class="btn btn-primary disabled" role="button">Add Product</a>
+        {% endif %}
       </div>
 
     </div>
     <!-- Products Page Title -->
 
+    {% if error != "None" %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
 
+    {% else %}
 
     <table class="table table-hover">
       <thead>
@@ -47,6 +58,7 @@
 
     </table>
 
+    {% endif %}
 
   </div>
 </div>

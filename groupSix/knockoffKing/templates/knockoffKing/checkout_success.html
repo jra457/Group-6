@@ -1,0 +1,38 @@
+{% extends 'knockoffKing/index.html' %}
+
+{% block content %}
+<!-- Checkout Page Start -->
+
+<div class="container px-1 py-3" id="checkoutContainer">
+  <div class="container">
+
+    <!-- Order Information -->
+    <h2>Thank you for your order!</h2>
+    <p>Your order number is: {{ order.id }}</p>
+    <p>Your order total is: ${{ order.getTotal }}</p>
+    <p>We will be in touch with shipping details soon.</p>
+
+    <!-- Products in Order -->
+    <div class="row row-cols-4 g-4">
+      {% for product in order_products %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+              style="max-width: 150px; height: auto;">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">
+              ${{ product.price }}
+              <br>
+            <p>{{ product.description|truncatechars:100 }}</p>
+            </p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+<!-- Checkout Page End -->
+{% endblock %}

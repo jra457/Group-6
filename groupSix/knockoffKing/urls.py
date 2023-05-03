@@ -26,11 +26,11 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
 
     # ~ Stores
-    path('seller/<slug:nameSlug>', views.seller_detail_view, name='seller-detail'),
+    path('seller/<slug:nameSlug>', views.store_view, name='seller-detail'),
 
     # ~ Products
     path('products/', views.products_view, name='products'),
-    path('product/<uuid:pk>', views.ProductDetailView.as_view(), name='product-detail'),
+    path('product/<uuid:pk>', views.product_detail_view, name='product-detail'),
     path('update_product/<product_id>', views.update_product_view, name='update-product'),
     path('add_product/', views.add_product_view, name='add-product'),
     path('delete_product/<product_id>', views.delete_product_view, name='delete-product'),
@@ -42,7 +42,8 @@ urlpatterns = [
 
     # ~ Checkout & Orders
     path('checkout/', views.checkout_view, name='checkout'),
-    path('orders/', views.orders_view, name='orders'),
+    path('checkout_success/<uuid:pk>', views.checkout_success_view, name='checkout-success'),
+    path('orders/', views.orders_customer_view, name='orders'),
     path('order/<uuid:pk>', views.order_detail_view, name='order-detail'),
     path('seller_orders/', views.orders_seller_view, name='seller-orders'),
     path('return/<uuid:oID>/<uuid:pID>', views.return_view, name='return'),

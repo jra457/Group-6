@@ -133,6 +133,8 @@ class Seller(models.Model):
 
     prevWithdraw = models.DateTimeField(null=True, blank=True)
 
+    authenticated = models.BooleanField(default=False, help_text='Authenticate Seller.')
+
     def get_absolute_url(self):
         nameSlug = slugify(self.name)
 

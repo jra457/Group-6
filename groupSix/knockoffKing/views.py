@@ -13,16 +13,14 @@ import re
 
 # ~~~~~~~~~~ Home View ~~~~~~~~~~
 def Home(request):
-    message = "None"
-    book_nook = Seller.objects.get(name='Book Nook')
-    book_list = Product.objects.filter(seller=book_nook)[:4]
-
-    sports_world = Seller.objects.get(name='Sports World')
-    equipment_list = Product.objects.filter(seller=sports_world)[:4]
+    # Initialize return values
+    message = "None"    
+    customer = None
+    seller = None
+    user_model_instance = None
 
     # Check for [HTTP] POST method
     if request.method == 'POST':
-
         # Fetch username & password
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -33,86 +31,42 @@ def Home(request):
         if user is not None:
             # Login user with credentials
             login(request, user)
-            print("REDIRECT")
+
             # Redirect user to home
             return redirect('home')
 
-    sellerList = Seller.objects.all()
-
-    seller_name = None
-    customer = None
-    seller = None
-    user_test = None
-    group_name = None
-    print("TEST1")
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
-            print("TEST2")
             user_model_instance = UserModel.objects.get(user=user_instance)
-            user_test = user_model_instance.user
-            group = user_test.groups.first()
-            if group:
-                group_name = group.name
-            else:
-                group_name = None
 
             # Check if the user is a Seller
             try:
-                print("TEST3")
                 seller = Seller.objects.get(user=user_model_instance)
-                seller_name = seller.name
 
             # If the user is not a Seller, try to find a Customer instance
             except Seller.DoesNotExist:
                 try:
-                    print("TEST4")
                     customer = Customer.objects.get(user=user_model_instance)
-                    customer_name = customer.user.firstName
 
                 except Customer.DoesNotExist:
-                    print("TEST5")
                     pass
-
+        # Exception for guests
         except UserModel.DoesNotExist:
-            print("USER DOES NOT EXIST")
             pass
 
-    else:
-        print("TEST6")
-        # ~~~~~ Return Generated Values ~~~~~
-        context = {
-            'seller': seller,
+    # Generate seller content for the home page
+    book_nook = Seller.objects.get(name='Book Nook')
+    book_list = Product.objects.filter(seller=book_nook)[:4]
 
-            'book_nook': book_nook,
-            'book_list': book_list,
-
-            'sports_world': sports_world,
-            'equipment_list': equipment_list,
-
-            'message': message,
-        }
-        messages_data = messages.get_messages(request)
-        message = next((m for m in messages_data if m.level == messages.SUCCESS), None)
-        if message:
-            context['message'] = message.message
-        return render(request, 'knockoffKing/home.html', context=context)
-
-    print("TEST7")
-    print("request.user:", request.user)
-    # print("usermodel.getUserID:", user_model_instance.getUserID())
-    # print("seller.user.id", seller.user.id)
-    # print("book_list[0].seller:", book_list[0].seller.user_id)
-    # print("user_instance.id", user_instance.id)
-    print("TEST8")
+    sports_world = Seller.objects.get(name='Sports World')
+    equipment_list = Product.objects.filter(seller=sports_world)[:4]
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-        # 'sellerList': sellerList,
-        # 'customer': customer,
-        'seller': seller,
-        # 'user_test': user_test,
-        # 'groupName': group_name,
         'usermodel': user_model_instance,
+        'seller': seller,
+        'customer': customer,
 
         'book_nook': book_nook,
         'book_list': book_list,
@@ -122,6 +76,7 @@ def Home(request):
 
         'message': message,
     }
+    # Get add to cart message
     messages_data = messages.get_messages(request)
     message = next((m for m in messages_data if m.level == messages.SUCCESS), None)
     if message:
@@ -133,9 +88,12 @@ def Home(request):
 
 # ~~~~~~~~~~ Login View ~~~~~~~~~~
 def login_view(request):
+    # Initialize return values
+    error = "None"
+
     # Check for [HTTP] POST method
     if request.method == 'POST':
-        error = "None"
+        
         # Fetch email & password
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -174,11 +132,13 @@ def logout_view(request):
 
 # ~~~~~~~~~~ Register View ~~~~~~~~~~
 def register_view(request):
+    # Initialize return values    
     error = "None"
-    if request.method == 'POST':
-        error = "None"
+    pattern = r'^[a-zA-Z\'\-]+$'
 
-        # Get the form attributes
+    if request.method == 'POST':
+
+        # Get form fields
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         email = request.POST.get('email')
@@ -196,7 +156,6 @@ def register_view(request):
             # Redirect to register page if email already exists
             error = f"The email {email} is already in use."
     
-        pattern = r'^[a-zA-Z\'\-]+$'
         name = f"{first_name} {last_name}"
         if not re.match(pattern, name):
             # Redirect to register page if email already exists
@@ -255,15 +214,29 @@ def register_view(request):
 # ~~~~~~~~~~ Profile View ~~~~~~~~~~
 @login_required
 def profile_view(request):
+    # Initialize return values
     success = False
     error = False
+    user_model_instance = None
+    user_instance_exists = False
+    seller_instance_exists = False
     pattern = r'^[a-zA-Z\'\-]+$'
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
-        user_model_instance = UserModel.objects.get(user=user_instance)
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            user_instance_exists = True
+
+        except:
+            user_instance_exists = False
         shipping_info, created = ShippingInfo.objects.get_or_create(user=user_model_instance)
+
+        # Check if the user is a Seller
         if user_instance.groups.filter(name='Seller').exists():
             seller = Seller.objects.get(user=user_model_instance)
+            seller_instance_exists = True
         else:
             seller = None
         
@@ -274,6 +247,8 @@ def profile_view(request):
             newLastName = request.POST.get('newLastName')
             newPass1 = request.POST.get('newPass1')
             newPass2 = request.POST.get('newPass2')
+            if seller_instance_exists:
+                newStoreName = request.POST.get('newStoreName')
 
             newAdd1 = request.POST.get('newAdd1')
             newAdd2 = request.POST.get('newAdd2')
@@ -281,55 +256,83 @@ def profile_view(request):
             newState = request.POST.get('newState')
             newZip = request.POST.get('newZip')
 
+            # ~ Update email
             if newEmail:
                 # Check if email already exists in database
-                if User.objects.filter(email=newEmail).exclude(email=user_model_instance.email).exists():
+                if User.objects.filter(email=newEmail).exclude(email=user_instance.email).exists():
                     # Redirect to register page if email already exists
                     error = f"The email {newEmail} is already in use."
                 else:
                     user_instance.username = newEmail
                     user_instance.email = newEmail
-                    user_model_instance.email = newEmail
+                    if user_instance_exists:
+                        user_model_instance.email = newEmail
 
+            # ~ Update First Name
             if newFirstName:
                 if not re.match(pattern, newFirstName):
                     # Redirect to register page if email already exists
                     error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
                 else:
                     user_instance.first_name = newFirstName
-                    user_model_instance.firstName = newFirstName
+                    if user_instance_exists:
+                        user_model_instance.firstName = newFirstName
 
+            # ~ Update Last Name
             if newLastName:
                 if not re.match(pattern, newFirstName):
                     # Redirect to register page if email already exists
                     error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
                 else:
                     user_instance.last_name = newLastName
-                    user_model_instance.lastName = newLastName
+                    if user_instance_exists:
+                        user_model_instance.lastName = newLastName
 
+            # ~ Update Password
             if newPass2:
+                # Check if passwords match
                 if newPass1 == newPass2:
                     user_instance.password = newPass1
-                    user_model_instance.password = newPass1
+                    if user_instance_exists:
+                        user_model_instance.password = newPass1
                 else:
+                    # Redirect to profile page if passwords do not match
                     error = "Password do not match."
 
+            # ~ Update Store Name
+            if seller_instance_exists and newStoreName:
+                seller.name = newStoreName
+
+            # ~ Update Address Line 1
             if newAdd1:
                 shipping_info.address1 = newAdd1
+
+            # ~ Update Address Line 2
             if newAdd2:
                 shipping_info.address2 = newAdd2
+
+            # ~ Update City
             if newCity:
                 shipping_info.city = newCity
+
+            # ~ Update State
             if newState:
                 shipping_info.state = newState
+
+            # ~ Update Zip Code
             if newZip:
                 shipping_info.zipCode = newZip
             
+            # Save new information if not error
             if not error:
                 user_instance.save()
-                user_model_instance.save()
                 shipping_info.save()
                 success = True
+                if user_instance_exists:
+                    user_model_instance.save()
+
+    if seller_instance_exists and not seller.authenticated:
+        error = "Seller account is pending approval."
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
@@ -346,75 +349,97 @@ def profile_view(request):
 
 
 # ~~~~~ Seller Detail View ~~~~~
-def seller_detail_view(request, nameSlug):
+def store_view(request, nameSlug):
+    # Initialize return values
     user_instance = None
     user_model_instance = None
+    seller = None
+    customer = None
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            user_test = user_model_instance.user
-            group = user_test.groups.first()
-            if group:
-                group_name = group.name
-            else:
-                group_name = None
 
             # Check if the user is a Seller
             try:
                 seller = Seller.objects.get(user=user_model_instance)
-                seller_name = seller.name
 
             # If the user is not a Seller, try to find a Customer instance
             except Seller.DoesNotExist:
                 try:
                     customer = Customer.objects.get(user=user_model_instance)
-                    customer_name = customer.user.firstName
 
                 except Customer.DoesNotExist:
                     pass
-
+        # Exception for Guests & Admins
         except UserModel.DoesNotExist:
-            print("USER DOES NOT EXIST")
             pass
+
     # Get Seller instance from Seller (slug) name
     seller = get_object_or_404(Seller, nameSlug=nameSlug)
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
-        'seller': seller,
-        # 'current_user': user_instance,
-        'user': user_instance,  # Pass the 'User' object to the context
-        # You can still pass the 'UserModel' object if needed
         'usermodel': user_model_instance,
+        'seller': seller,
+        'customer': customer,        
     }
     # Redirect to Seller Detail Page
-    return render(request, 'knockoffKing/seller_detail.html', context=context)
+    return render(request, 'knockoffKing/store.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
 # ~~~~~~~~~~ Products View ~~~~~~~~~~
+@login_required
 def products_view(request):
+    # Initialize return values
+    seller = None
+    customer = None
+    seller_model_instance = None
+    product_list = None
+    seller_instance_exists = False
+    error = "None"
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-            seller_model_instance = Seller.objects.get(user=user_model_instance)
-            seller = seller_model_instance
-        except Customer.DoesNotExist:
+
+            # Check if the user is a Seller
+            try:
+                seller_model_instance = Seller.objects.get(user=user_model_instance)
+                seller = seller_model_instance
+                seller_instance_exists = True
+
+            # If the user is not a Seller, try to find a Customer instance
+            except Seller.DoesNotExist:
+                try:
+                    customer = Customer.objects.get(user=user_model_instance)
+
+                except Customer.DoesNotExist:
+                    pass
+        # Exception for Admins
+        except UserModel.DoesNotExist:
             pass
 
-        product_list = Product.objects.filter(seller=seller_model_instance)
+        # Get Products for Seller
+        if seller_instance_exists:
+            product_list = Product.objects.filter(seller=seller_model_instance)
 
-        product_test = Product.objects.filter(seller=seller_model_instance)[:1]
-        product_test = product_test[0]
+        # Generate error message if User is Admin or Customer
+        else:
+            error = "You must be logged in as a Seller to view the Products Page!"
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'seller': seller,
         'product_list': product_list,
+        'error': error,
     }
     return render(request, 'knockoffKing/products.html', context=context)
     # ~~~~~
@@ -422,47 +447,58 @@ def products_view(request):
 
 
 
-# ~~~~~ Seller Detail View ~~~~~
-class ProductDetailView(generic.DetailView):
-    model = Product
+# ~~~~~ Product Detail View ~~~~~
+def product_detail_view(request, pk):
+    # Get product by Product ID
+    product = get_object_or_404(Product, pk=pk)
 
-    def product_detail_view(request, primary_key):
-        product = get_object_or_404(Product, pk=primary_key)
+    # If user is logged in, get UserModel instance
+    if request.user.is_authenticated:
+        user_instance = request.user
+        # Check if the user is a Seller
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            seller = Seller.objects.get(user=user_model_instance)
+        # Exception for Admins
+        except Seller.DoesNotExist:
+            pass
 
-        if request.user.is_authenticated:
-            user_instance = request.user
-            try:
-                user_model_instance = UserModel.objects.get(user=user_instance)
-                seller = Seller.objects.get(user=user_model_instance)
-            except Seller.DoesNotExist:
-                pass
-
-        # ~~~~~ Return Generated Values ~~~~~
-        context = {
-            'product': product,
-            'seller': seller,
-        }
-        return render(request, 'knockoffKing/product_detail.html', context=context)
-        # ~~~~~
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'product': product,
+        'seller': seller,
+        'usermodel': user_model_instance,
+    }
+    return render(request, 'knockoffKing/product_detail.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
+@login_required
 def update_product_view(request, product_id):
+    # Check for [HTTP] POST method
     if request.method == 'POST':
         # Fetch new Name/Price/Quantity
         newName = request.POST.get('newName')
+        newDescrip = request.POST.get('newDescrip')
         newPrice = request.POST.get('newPrice')
         newQuantity = request.POST.get('newQuantity')
+        newImage = request.FILES['newImage']
+
+        # Save the image file
+        image_path = default_storage.save('products/' + newImage.name, newImage)
 
         # Fetch product by ID
         product = Product.objects.get(pk=product_id)
 
     # Update product instance values
     product.name = newName
+    product.description = newDescrip
     product.price = newPrice
     product.quantity = newQuantity
+    product.image = image_path
     product.save()  # Save updated product instance
 
     # Return to update product page
@@ -473,13 +509,15 @@ def update_product_view(request, product_id):
 
 # ~~~~~~~~~~ Update Product ~~~~~~~~~~
 def add_product_view(request):
+    # Initialize return values
     error = "None"
     success = False
 
-    # Check if User is logged in
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
-        # Attempt to get seller
+
+        # Check if the user is a Seller
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
             seller = Seller.objects.get(user=user_model_instance)
@@ -489,6 +527,7 @@ def add_product_view(request):
             error = "You must be logged in as a seller to add a product."
             return render(request, 'knockoffKing/add_product.html', {'error': error})
         
+    # Check for [HTTP] POST method
     if request.method == 'POST':
 
         # Fetch Product Name
@@ -552,28 +591,34 @@ def delete_product_view(request, product_id):
 
 # ~~~~~~~~~~ Cart View ~~~~~~~~~~
 def cart_view(request):
+    # Initialize return values
     errors = []
+    user_model_instance = None
+    user_instance_exists = False
+    cart_instance = None
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
+            user_instance_exists = True
         except UserModel.DoesNotExist:
             pass
 
-    
-
-        cart_instance, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
-        cart = cart_instance.items.all()
+        # Populate cart objects or create cart
+        if user_instance_exists:
+            cart_instance, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
+            cart = cart_instance.items.all()
         
-        # Check quantity of products in cart
-        for product in cart:
-            if product.quantity <= 0:
-                # Create error message
-                errors.append(f"The product '{product.name}' is currently out of stock and was removed your from cart.")
-                # Remove item from cart
-                cart_instance.remove_item(product)
+            # Check quantity of products in cart
+            for product in cart:
+                if product.quantity <= 0:
+                    # Create error message
+                    errors.append(f"The product '{product.name}' is currently out of stock and was removed your from cart.")
+                    # Remove item from cart
+                    cart_instance.remove_item(product)
             
-
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'errors': errors,
@@ -585,22 +630,27 @@ def cart_view(request):
 
 
 
-@login_required
 # ~~~~~~~~~~ Add to Cart View ~~~~~~~~~~
+@login_required
 def add_to_cart(request, product_id):
+    # Initialize return values
     message = "None"
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-        except UserModel.DoesNotExist:  # Update this line
+        except UserModel.DoesNotExist:
             pass
 
+        # Add product to cart, create cart if it does not exist
         product = get_object_or_404(Product, id=product_id)
         cart, created = ShoppingCart.objects.get_or_create(user=user_model_instance)
         
         quantity = request.POST.get('quantity', 1)
 
+        # Create success message
         message = f"({quantity}) {product.name} was added to your cart."
         messages.success(request, message)
 
@@ -614,14 +664,15 @@ def add_to_cart(request, product_id):
 
 
 
-@login_required
 # ~~~~~~~~~~ Remove from Cart View ~~~~~~~~~~
+@login_required
 def remove_from_cart(request, product_id):
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
             user_model_instance = UserModel.objects.get(user=user_instance)
-        except UserModel.DoesNotExist:  # Update this line
+        except UserModel.DoesNotExist:
             pass
 
         product = get_object_or_404(Product, id=product_id)
@@ -637,6 +688,7 @@ def remove_from_cart(request, product_id):
 # ~~~~~~~~~~ Check Out Cart View ~~~~~~~~~~
 @login_required
 def checkout_view(request):
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
@@ -678,12 +730,8 @@ def checkout_view(request):
             order.sellers.add(seller)
 
         # Calculate the total price for the order
-        print("cart_instance.quantity:", cart_instance.quantity)
-        print("cart_instance.get_total_price():", cart_instance.get_total_price())
         orderTotal = cart_instance.get_total_price()
-        print("orderTotal:", orderTotal)
         order.subTotal = orderTotal
-        print("order.subTotal:", order.subTotal)
         order.save()
 
         # Clear the shopping cart
@@ -694,8 +742,7 @@ def checkout_view(request):
         active_order.subTotal = orderTotal
         active_order.save()
 
-        context = {'order': order}
-        return render(request, 'knockoffKing/checkout.html', context=context)
+        return redirect(reverse('checkout-success', args=[order.id]))
     else:
         return redirect('login')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -704,56 +751,94 @@ def checkout_view(request):
 
 # ~~~~~~~~~~ Orders View ~~~~~~~~~~
 @login_required
-def orders_view(request):
+def checkout_success_view(request, pk):
+    # Initialize return values
+    user_model_instance = None
+    order = get_object_or_404(Order, id=pk)
+    order_products = order.items.all()
+    
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
-        user_role = None
+        user_instance = request.user
         try:
-            user_instance = request.user
             user_model_instance = UserModel.objects.get(user=user_instance)
-        
-            active_orders = ActiveOrders.objects.filter(user=user_model_instance)
+
+            # Check if the user is a Seller
             try:
                 Seller.objects.get(user_id=user_model_instance.id)
-                print("SELLER")
-                user_role = 'Seller'
+
+            # If the user is not a Seller, try to find a Customer instance
             except Seller.DoesNotExist:
                 try:
                     Customer.objects.get(user_id=user_model_instance.id)
-                    print("CUSTOMER")
-                    user_role = 'Customer'
+
                 except Customer.DoesNotExist:
                     pass
+
+        # Exception for Admins
         except UserModel.DoesNotExist:
             pass
 
-        # Print the user role in the terminal
-        print(f"User {user_instance} is a {user_role}")
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'order': order,
+        'order_products': order_products,
+    }
+    return render(request, 'knockoffKing/checkout_success.html', context=context)
+    # ~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+# ~~~~~~~~~~ Orders View ~~~~~~~~~~
+@login_required
+def orders_customer_view(request):
+    # Initialize return values
+    user_model_instance = None
+    active_orders = None
+
+    # If user is logged in, get UserModel instance
+    if request.user.is_authenticated:
+        user_instance = request.user
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
+            active_orders = ActiveOrders.objects.filter(user=user_model_instance)
+
+            # Check if the user is a Seller
+            try:
+                Seller.objects.get(user_id=user_model_instance.id)
+
+            # If the user is not a Seller, try to find a Customer instance
+            except Seller.DoesNotExist:
+                try:
+                    Customer.objects.get(user_id=user_model_instance.id)
+
+                except Customer.DoesNotExist:
+                    pass
+
+        # Exception for Admins
+        except UserModel.DoesNotExist:
+            pass
         
-
-
-        # ~~~~~ Return Generated Values ~~~~~
-        context = {
-            'active_orders': active_orders,
-            'customer': user_model_instance,
-        }
-        return render(request, 'knockoffKing/orders.html', context=context)
-        # ~~~~~
-    else:
-        return redirect('login')
+    # ~~~~~ Return Generated Values ~~~~~
+    context = {
+        'active_orders': active_orders,
+        'customer': user_model_instance,
+    }
+    return render(request, 'knockoffKing/orders_customer.html', context=context)
+    # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
 # ~~~~~ Order Detail View ~~~~~
+@login_required
 def order_detail_view(request, pk):
+    # Initialize return values
     seller = None
-    
-    order_history = get_object_or_404(Order, id=pk)
-    order_items = order_history.orderitem_set.all()
 
-    for item in order_items:
-        print(item.product.name, item.quantity, item.price, item.get_absolute_url())
-
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
         try:
@@ -762,8 +847,8 @@ def order_detail_view(request, pk):
         except Seller.DoesNotExist:
             pass
 
-    for item in order_items:
-        print("item.return_available()", item.return_available())
+    order_history = get_object_or_404(Order, id=pk)
+    order_items = order_history.orderitem_set.all()
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
@@ -780,24 +865,38 @@ def order_detail_view(request, pk):
 # ~~~~~~~~~~ Order Seller View ~~~~~~~~~~
 @login_required
 def orders_seller_view(request):
+    # Initialize return values
+    seller = None
+    seller_instance_exists = False
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
     try:
         user_model_instance = UserModel.objects.get(user=user_instance)
-        seller_model_instance = Seller.objects.get(user=user_model_instance)
-        seller = seller_model_instance
+        seller = Seller.objects.get(user=user_model_instance)
+        seller_instance_exists = True
+    
+    # Exception for Admins
     except Seller.DoesNotExist:
-        redirect('orders')
+        pass
 
-    # seller = Seller.objects.get(pk=seller_id)
-    active_orders = Order.objects.filter(sellers=seller)
-    print("orders:", active_orders[1].subTotal)
+    # Redirect Customers Orders page
+    if not seller_instance_exists:
+        return redirect('orders')
+
+    # Exception for Admins
+    try:
+        active_orders = Order.objects.filter(sellers=seller)
+    except:
+        active_orders = None
+
     # ~~~~~ Return Generated Values ~~~~~
     context = {
         'active_orders': active_orders,
         'seller': seller,
     }
-    return render(request, 'knockoffKing/seller_orders.html', context=context)
+    return render(request, 'knockoffKing/orders_seller.html', context=context)
     # ~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -806,20 +905,25 @@ def orders_seller_view(request):
 # ~~~~~~~~~~ Return View ~~~~~~~~~~
 @login_required
 def return_view(request, oID, pID):
+    # Initialize return values
     error = "None"
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
     try:
         user_model_instance = UserModel.objects.get(user=user_instance)
-        user = User.objects.get(usermodel=user_model_instance)
     except User.DoesNotExist:
         redirect('orders')
 
+    # Get Order and Product being returned
     order = get_object_or_404(Order, id=oID)
     product = get_object_or_404(Product, id=pID)
 
+    # Get the Order Item from Product & Order
     item = get_object_or_404(OrderItem, order=order, product=product)
 
+    # Error out if Product cannot be returned
     if not item.return_available():
         error = f"Error: {product.name} in order ({order.id}) has already been returned."
 
@@ -841,23 +945,32 @@ def return_view(request, oID, pID):
 # ~~~~~~~~~~ Return View ~~~~~~~~~~
 @login_required
 def return_process_view(request, oID, pID):
+    # Initialize return values
+    quantity = 0
+
+    # Check for [HTTP] POST method
     if request.method == 'POST':
         # Fetch return quantity
         quantity = request.POST.get('quantity')
+
+    # Get Order and Product instances
     quantity = int(quantity)
     order = get_object_or_404(Order, id=oID)
     product = get_object_or_404(Product, id=pID)
     seller = get_object_or_404(Seller, user=product.seller.user)
     item = get_object_or_404(OrderItem, order=order, product=product)
 
+    # Calculate return value
     value = quantity * item.price
     seller.refund(value)
 
+    # Add the Product back to the Seller
     item.returnQuantity += quantity
     item.save()
     product.quantity += quantity
     product.save()
 
+    # Error if Product cannot be returned
     if (item.return_available()):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
     else:
@@ -868,17 +981,19 @@ def return_process_view(request, oID, pID):
 
 # ~~~~~~~~~~ Deposit View ~~~~~~~~~~
 def deposit_view(request):
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
+    # Check if the user is a Seller
     try:
         user_model_instance = UserModel.objects.get(user=user_instance)
-        seller_model_instance = Seller.objects.get(user=user_model_instance)
-        seller = seller_model_instance
+        seller = Seller.objects.get(user=user_model_instance)
+    # Redirect to Orders if invalid Seller
     except Seller.DoesNotExist:
         redirect('orders')
 
+    # Update Seller's balance
     Transactions.objects.create(seller=seller, amount=seller.income, category='Deposit')
-
     seller.deposit()
     
     # Redirect to seller orders
@@ -889,17 +1004,19 @@ def deposit_view(request):
 
 # ~~~~~~~~~~ Withdraw View ~~~~~~~~~~
 def withdraw_view(request):
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
+    # Check if the user is a Seller
     try:
         user_model_instance = UserModel.objects.get(user=user_instance)
-        seller_model_instance = Seller.objects.get(user=user_model_instance)
-        seller = seller_model_instance
+        seller = Seller.objects.get(user=user_model_instance)
+    # Redirect to Orders if invalid Seller
     except Seller.DoesNotExist:
         redirect('orders')
 
+    # Update Seller's balance
     Transactions.objects.create(seller=seller, amount=seller.income, category='Withdraw')
-
     seller.withdraw()
     
     # Redirect to seller orders
@@ -911,16 +1028,18 @@ def withdraw_view(request):
 # ~~~~~~~~~~ Withdraw History View ~~~~~~~~~~
 @login_required
 def transactions_view(request):
-        
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
         user_instance = request.user
+    # Check if the user is a Seller
     try:
         user_model_instance = UserModel.objects.get(user=user_instance)
-        seller_model_instance = Seller.objects.get(user=user_model_instance)
-        seller = seller_model_instance
+        seller = Seller.objects.get(user=user_model_instance)
+    # Redirect to Orders if invalid Seller
     except Seller.DoesNotExist:
         redirect('orders')
 
+    # Create list of transactions for corresponding Seller
     transactions = Transactions.objects.filter(seller=seller)
 
     # ~~~~~ Return Generated Values ~~~~~
@@ -936,25 +1055,31 @@ def transactions_view(request):
 
 # ~~~~~~~~~~ Search View ~~~~~~~~~~
 def search_view(request):
+    # Initialize return values
     seller = None
     user_model_instance = None
+
+    # If user is logged in, get UserModel instance
     if request.user.is_authenticated:
-        print("USER IS AUTHENTICATED")
         user_instance = request.user
-        user_model_instance = UserModel.objects.get(user=user_instance)
 
-        if user_instance.groups.filter(name='Seller').exists():
-            print("USER IS A SELLER")
-            seller = Seller.objects.get(user=user_model_instance)
-        else:
-            print("USER IS NOT A SELLER")
-            seller = None
+        try:
+            user_model_instance = UserModel.objects.get(user=user_instance)
 
+            # Check if the user is a Seller
+            if user_instance.groups.filter(name='Seller').exists():
+                seller = Seller.objects.get(user=user_model_instance)
+            else:
+                seller = None
+        # Exception for Admins
+        except:
+            pass
+
+    # Get Search query
     query = request.GET.get('q')
 
+    # Search Database for Search query
     products = Product.objects.filter(name__icontains=query)
-
-    print("products:", products)
 
     # ~~~~~ Return Generated Values ~~~~~
     context = {
