@@ -1,5 +1,7 @@
 {% extends 'knockoffKing/index.html' %}
 
+{% load group_tags %} {# Load the custom filter #}
+
 {% block content %}
 <!-- Profile Page Start -->
 <div class="container px-1 py-3" id="profileContainer">
@@ -67,7 +69,21 @@
 					<!-- (Input) Password2 -->
 
 
+					{% if user|has_group:"Seller" %}
+					<!-- (Input) Store Name -->
+					<div class="col-md-12">
+						<label for="newStoreName" class="form-label">Store Name</label>
+						{% if seller.authenticated %}
+							<input type="text" class="form-control" id="newStoreName" name="newStoreName" value="{{ seller.name }}">
+						{% else %}
+							<input type="text" class="form-control" id="newStoreName" name="newStoreName" value="{{ seller.name }}" disabled>
+						{% endif %}
+					</div>
+					<!-- (Input) Store Name -->
+					{% endif %}
 
+
+					
 					<!-- (Button) Update Profile -->
 					<div class="col-12">
 						<button class="btn btn-secondary" type="submit">Update Profile</button>
@@ -167,6 +183,9 @@
 	});
 	document.querySelector('#newPass2').addEventListener('input', function () {
 			document.querySelector('#newPass2').textContent = this.value;
+	});
+	document.querySelector('#newStore').addEventListener('input', function () {
+			document.querySelector('#newStore').textContent = this.value;
 	});
 
 	document.querySelector('#newAdd1').addEventListener('input', function () {

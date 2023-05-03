@@ -13,8 +13,10 @@
       <div class="px-3 py-0 my-0" style=>
         {% if error != "None" %}
           <a class="d-none btn btn-primary" role="button">Add Product</a>
-        {% else %}
+        {% elif seller.authenticated %}
           <a href="{% url 'add-product' %}" class="btn btn-primary" role="button">Add Product</a>
+        {% else %}
+          <a class="btn btn-primary disabled" role="button">Add Product</a>
         {% endif %}
       </div>
 
