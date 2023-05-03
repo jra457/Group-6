@@ -692,11 +692,12 @@ def checkout_view(request):
     if request.user.is_authenticated:
         user_instance = request.user
         user_model_instance = UserModel.objects.get(user=user_instance)
-
+        customer_instance = Customer.objects.get(user=user_model_instance)
         cart_instance = ShoppingCart.objects.get(user=user_model_instance)
 
         # Create a new order
         order = Order()
+        order.customer = customer_instance
         order.save()
 
         # Set to keep track of unique sellers in the order

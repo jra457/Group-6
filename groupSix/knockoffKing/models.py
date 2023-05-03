@@ -10,24 +10,19 @@ from django.contrib.auth.hashers import make_password, check_password
 # Create your models here.
 
 # ~~~~~ User Model ~~~~~
-
-
 class UserModel(models.Model):
     """Model representing the User."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    email = models.EmailField(
-        max_length=255, verbose_name='email address', help_text='Enter your Email.', unique=True)
+    email = models.EmailField(max_length=255, verbose_name='email address', help_text='Enter your Email.', unique=True)
 
     password = models.CharField(max_length=128)
 
-    firstName = models.CharField(
-        max_length=64, default='', help_text='Enter your Last Name.')
+    firstName = models.CharField(max_length=64, default='', help_text='Enter your Last Name.')
 
-    lastName = models.CharField(
-        max_length=64, default='', help_text='Enter your First Name..')
+    lastName = models.CharField(max_length=64, default='', help_text='Enter your First Name..')
 
     joinDate = models.DateTimeField(auto_now_add=True)
 
@@ -47,6 +42,8 @@ class UserModel(models.Model):
         return f'{self.lastName}, {self.firstName}, {self.email}'
 
     class Meta:
+        verbose_name = "User Model"
+        verbose_name_plural = "User Models"
         ordering = ['lastName', 'firstName']
 
 # ~~~~~
@@ -194,20 +191,21 @@ class Transactions(models.Model):
 
     category = models.CharField(
         max_length=10, choices=categories, default='Deposit')
+    
+    class Meta:
+        verbose_name = "Transaction"
+        verbose_name_plural = "Transactions"
 # ~~~~~
 
 
 # ~~~~~ Shipping Info Model ~~~~~
 class ShippingInfo(models.Model):
     """Model representing the Shipping Info."""
-    user = models.ForeignKey(
-        UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    address1 = models.CharField(
-        max_length=16, default='', help_text='Address Line 1', db_column="streetNumber")
+    address1 = models.CharField(max_length=16, default='', help_text='Address Line 1', db_column="streetNumber")
 
-    address2 = models.CharField(
-        max_length=64, default='', help_text='Address Line 2', db_column="streetName")
+    address2 = models.CharField(max_length=64, default='', help_text='Address Line 2', db_column="streetName")
 
     city = models.CharField(max_length=64, default='', help_text='City')
 
@@ -281,6 +279,10 @@ class ShippingInfo(models.Model):
         else:
             returnStr = f"({self.user.email}) {self.address1}, {self.city}, {self.state}, {self.zipCode}"
         return returnStr
+    
+    class Meta:
+        verbose_name = "Shipping Info"
+        verbose_name_plural = "Shipping Info"
 # ~~~~~
 
 
@@ -297,11 +299,9 @@ class Order(models.Model):
 
     dateShipped = models.DateField(null=True, blank=True)
 
-    customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, null=True, help_text='Select the Customer.')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, help_text='Select the Customer.')
 
-    shippingID = models.ForeignKey(
-        ShippingInfo, on_delete=models.CASCADE, null=True, help_text='Select the Shipping Info.')
+    shippingID = models.ForeignKey(ShippingInfo, on_delete=models.CASCADE, null=True, help_text='Select the Shipping Info.')
 
     # ~~~~~ Shipping Status
     orderPlaced, packaging, shipped, = '01', '02', '03'
@@ -369,6 +369,10 @@ class OrderItem(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.quantity}x {self.product} in {self.order}'
+    
+    class Meta:
+        verbose_name = "Order Item"
+        verbose_name_plural = "Order Items"
 # ~~~~~
 
 
@@ -382,6 +386,10 @@ class ActiveOrders(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return str(self.order)
+    
+    class Meta:
+        verbose_name = "Active Order"
+        verbose_name_plural = "Active Orders"
 # ~~~~~
 
 
@@ -395,6 +403,10 @@ class OrderHistory(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return str(self.order)
+    
+    class Meta:
+        verbose_name = "Order History"
+        verbose_name_plural = "Order History"
 # ~~~~~
 
 
@@ -403,8 +415,7 @@ class ShoppingCart(models.Model):
     """Model representing the Shopping Cart."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    user = models.ForeignKey(
-        UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
     items = models.ManyToManyField(Product, through='CartItem')
 
@@ -415,8 +426,7 @@ class ShoppingCart(models.Model):
 
     def add_item(self, product, quantity=1):
         # Check if the product is already in the cart
-        cart_item, created = CartItem.objects.get_or_create(
-            shoppingCart=self, product=product)
+        cart_item, created = CartItem.objects.get_or_create(shoppingCart=self, product=product)
 
         if created:
             # If the item is newly created, set the quantity
@@ -439,6 +449,10 @@ class ShoppingCart(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return str(self.id)
+    
+    class Meta:
+        verbose_name = "Shopping Cart"
+        verbose_name_plural = "Shopping Carts"
 # ~~~~~
 
 
