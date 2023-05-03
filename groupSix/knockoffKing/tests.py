@@ -161,15 +161,11 @@ class AdminTestCase(TestCase):
             # Add any required fields for the Seller model here
         )
 
-        # Create a sample image file for the products
-        image_file = SimpleUploadedFile(
-            "product_image.jpg", b"file_content", content_type="image/jpeg")
-
         # Create some sample products and a regular user
         self.product1 = Product.objects.create(
-            name='Product1', price=100, image=image_file, seller=self.seller_user)
+            name='Product1', price=100, seller=self.seller_user)
         self.product2 = Product.objects.create(
-            name='Product2', price=200, image=image_file, seller=self.seller_user)
+            name='Product2', price=200, seller=self.seller_user)
         self.regular_user = User.objects.create_user(
             username='user', email='user@example.com', password='userpassword'
         )
