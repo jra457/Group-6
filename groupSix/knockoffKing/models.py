@@ -68,8 +68,7 @@ class Product(models.Model):
 
     image = models.ImageField(upload_to='products/', blank=True, null=True)
 
-    seller = models.ForeignKey('Seller', on_delete=models.CASCADE,
-                               null=True, blank=True, help_text='Select the Product.')
+    seller = models.ForeignKey('Seller', on_delete=models.CASCADE, null=True, blank=True, help_text='Select the Product.')
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -121,10 +120,9 @@ class Seller(models.Model):
     user = models.ForeignKey(
         UserModel, on_delete=models.CASCADE, null=True, help_text='Select the User.')
 
-    name = models.CharField(max_length=64, default='',
-                            help_text='Enter the store Name.')
+    name = models.CharField(max_length=64, default='', help_text='Enter the store Name.')
 
-    nameSlug = models.SlugField(unique=True, null=True, blank=True)
+    nameSlug = models.SlugField(unique=True, null=True, blank=True, default=user)
 
     income = models.DecimalField(default=0, max_digits=10, decimal_places=2)
 
@@ -157,7 +155,12 @@ class Seller(models.Model):
 
     def save(self, *args, **kwargs):
         """Override the save method to set the slug_name field."""
-        self.nameSlug = slugify(self.name)
+        if self.name == '':
+            self.nameSlug = slugify(self.user.email)
+            self.name = self.nameSlug
+        else:
+            self.name = self.name
+            self.nameSlug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):

@@ -40,7 +40,7 @@
 
       <!-- Product Form Column Start -->
       <div class="col-md-6">
-        <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}">
+        <form class="row g-3 needs-validation" method="POST" action="{% url 'update-product' product.id %}" enctype="multipart/form-data">
 
           {% csrf_token %}
 

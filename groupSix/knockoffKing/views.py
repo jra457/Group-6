@@ -134,7 +134,7 @@ def logout_view(request):
 def register_view(request):
     # Initialize return values    
     error = "None"
-    pattern = r'^[a-zA-Z\'\-]+$'
+    
 
     if request.method == 'POST':
 
@@ -156,10 +156,14 @@ def register_view(request):
             # Redirect to register page if email already exists
             error = f"The email {email} is already in use."
     
-        name = f"{first_name} {last_name}"
+        pattern = r'^[a-zA-Z\'\-]+$'
+        name = f"{first_name}{last_name}"
+        print("name", name)
         if not re.match(pattern, name):
-            # Redirect to register page if email already exists
+            # Redirect to register page if email already exists\
+            print("FALSE")
             error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
+        
 
         # ~~~~~ Return Field Inputs ~~~~~
         context = {
@@ -172,7 +176,7 @@ def register_view(request):
         # ~~~~~
 
         # Return to register page if error
-        if error:
+        if error != "None":
             return render(request, 'knockoffKing/register.html', context=context)
 
 
@@ -280,7 +284,7 @@ def profile_view(request):
 
             # ~ Update Last Name
             if newLastName:
-                if not re.match(pattern, newFirstName):
+                if not re.match(pattern, newLastName):
                     # Redirect to register page if email already exists
                     error = f"Please enter a valid name containing letters, spaces, apostrophes, and hyphens only."
                 else:
@@ -302,6 +306,8 @@ def profile_view(request):
             # ~ Update Store Name
             if seller_instance_exists and newStoreName:
                 seller.name = newStoreName
+                seller.nameSlug = slugify(newStoreName)
+                seller.save()
 
             # ~ Update Address Line 1
             if newAdd1:
@@ -485,20 +491,25 @@ def update_product_view(request, product_id):
         newDescrip = request.POST.get('newDescrip')
         newPrice = request.POST.get('newPrice')
         newQuantity = request.POST.get('newQuantity')
-        newImage = request.FILES['newImage']
-
-        # Save the image file
-        image_path = default_storage.save('products/' + newImage.name, newImage)
 
         # Fetch product by ID
         product = Product.objects.get(pk=product_id)
 
     # Update product instance values
     product.name = newName
-    product.description = newDescrip
     product.price = newPrice
     product.quantity = newQuantity
-    product.image = image_path
+
+    # Check if new description was provided
+    if newDescrip.strip() != '':
+        product.description = newDescrip
+
+    # Check if new image was provided
+    if request.FILES.get('newImage', None) is not None:
+        # Save the image file
+        newImage = request.FILES['newImage']
+        product.image  = default_storage.save('products/' + newImage.name, newImage)
+    
     product.save()  # Save updated product instance
 
     # Return to update product page
